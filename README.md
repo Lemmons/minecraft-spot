@@ -37,12 +37,12 @@ module "minecraft-spot" {
 
   vpc_id = "<the vpc_id containing the above subnets>"
 }
+```
 
 Once the module has been applied and you have waited a few minutes for everything to stablize, you can go to the route `https://api.<your_domain>/minecraft/start?magic_word=something-clever` to start the minecraft instance. 
 The first run it might take 10-20 minutes to load, but subsiquent start should only take around 5 mins.
 Once it's up and running, you can shutdown the server using `https://api.<your_domain>/minecraft/stop?magic_word=something-clever`,
 or the server will shutdown on it's own after 30 mins of inactivity (no users connected to the minecraft server).
-```
 
 ## Toubleshooting
 You can ssh into your instance using your username and ssh key provided in the module config.  Depending on how far through it's start it got, you might be able to ssh to the instance using `minecraft.<your_domain>`.  If that doesn't work, you will have to get the instance's public ip address from the aws console or CLI.
