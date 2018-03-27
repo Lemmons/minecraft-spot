@@ -101,7 +101,7 @@ resource "aws_iam_role_policy" "minecraft" {
             "route53:ListResourceRecordSets",
             "autoscaling:DescribeAutoScalingInstances",
             "autoscaling:CompleteLifecycleAction",
-            "autoscaling:SetDesiredCapacity",
+            "autoscaling:SetDesiredCapacity"
           ],
           "Effect": "Allow",
           "Resource": "*"
