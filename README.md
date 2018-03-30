@@ -50,9 +50,10 @@ You can ssh into your instance using your username and ssh key provided in the m
 ## Future plans
 - Proper authentication for the api page using Auth0
 - An html status page for checking server status, bringing up the server, tearing it down, etc
-- Periodic backups (not just at shutdown time)
 - Backup system upgrades
+    - Periodic backups (not just at shutdown time)
     - Faster shutdown
-    - Support modpack version upgrades (the current backup system doesn't allow upgrades due to it snapshotting the entire minecraft file system)
+    - Support modpack version upgrades (~the current backup system doesn't allow upgrades due to it snapshotting the entire minecraft file system~
+    Actually we just need to use the `REMOVE_OLD_MODS="TRUE"` env var when starting the minecraft container.  Still not sure how this should be implemented... probably some how through the api)
 - Add support for vanilla minecraft
 - Ensure minecraft exits when given the command to
