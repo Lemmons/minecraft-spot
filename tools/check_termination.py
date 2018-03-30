@@ -52,8 +52,7 @@ def stop_and_backup_minecraft():
         time.sleep(1)
 
     LOGGER.info('backing up minecraft')
-    key = "backups/{}.tgz".format(arrow.now().format('YYYYMMDDHHmmss'))
-    key_latest = "backups/latest.tgz"
+    key = "backups/latest.tgz"
     with tempfile.NamedTemporaryFile() as file:
         with tarfile.open(fileobj=file, mode='w:gz') as tar:
             tar.add(MINECRAFT_DATA)
@@ -61,7 +60,6 @@ def stop_and_backup_minecraft():
         LOGGER.info('Uploading backup to s3 at {}'.format(key))
         client = get_boto_client('s3')
         client.upload_file(file.name, S3_BUCKET, key)
-        client.upload_file(file.name, S3_BUCKET, key_latest)
 
 def get_instance_details():
     client = get_boto_client('autoscaling')

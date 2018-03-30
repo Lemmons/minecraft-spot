@@ -53,7 +53,6 @@ You can ssh into your instance using your username and ssh key provided in the m
 - Periodic backups (not just at shutdown time)
 - Backup system upgrades
     - Faster shutdown
-    - Use versioned s3 bucket with deletion policy for backups (rather than current timestamp based one)
     - Support modpack version upgrades (the current backup system doesn't allow upgrades due to it snapshotting the entire minecraft file system)
 - Add support for vanilla minecraft
 - Ensure minecraft exits when given the command to

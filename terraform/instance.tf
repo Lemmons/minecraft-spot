@@ -113,4 +113,15 @@ resource "aws_iam_role_policy" "minecraft" {
 
 resource "aws_s3_bucket" "minecraft" {
   bucket = "${var.bucket_name}"
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule  {
+    enabled = true
+    noncurrent_version_expiration {
+      days = 5
+    }
+  }
 }
