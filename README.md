@@ -57,3 +57,4 @@ You can ssh into your instance using your username and ssh key provided in the m
     Actually we just need to use the `REMOVE_OLD_MODS="TRUE"` env var when starting the minecraft container.  Still not sure how this should be implemented... probably some how through the api)
 - Add support for vanilla minecraft
 - Ensure minecraft exits when given the command to
+- More restrictive iam resources for permissions
