@@ -43,3 +43,13 @@ def stop(event, context):
         "headers": {"Content-Type": "application/json"},
         "body": "stopping"
     }
+
+def status(event, context):
+    # last backup time and size
+    # server status (up, starting up, down, shutting down)
+    # current uptime (if up)
+    # approx current cost (if up)
+    # player count (if up)
+    # total uptime (past month, past week, past day)
+    # approx total cost (past month, past week, past day)
+    pass
