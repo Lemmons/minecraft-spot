@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import json
 import logging
 import os
+import os.path
 import sys
 import tarfile
 import tempfile
@@ -40,11 +42,45 @@ def get_minecraft():
     return get_minecraft._container
 get_minecraft._container = None
 
+#TODO: Might want to break backup stuff into it's own file/service
+def light_backup(force_backup=False):
+    if force_backup:
+        LOGGER.info('backing-up minecraft')
+        minecraft = get_minecraft()
+        if minecraft.status != "exited": #TODO: also ensure minecraft is running (healthy?)
+            minecraft.exec_run('rcon-cli ftb backup start') #TODO: check output and wait for backup to finish? Or poll backup index file
+
+    LOGGER.info('saving minecraft backup to s3')
+    backups_path = os.path.join(MINECRAFT_DATA, 'backups')
+    backups_index = os.path.join(backups_path, 'backups.json')
+
+    backups = {backup['time']: backup for backup in json.load(backups_index) if backup['success']==True}
+    latest_backup = backups[max(backups.keys())]
+    save_to_s3(os.path.join(backups_path, latest_backup['file']), 'backups/light.zip')
+
+    get_last_light_backup_time._time = time.time()
+
+    #TODO: maybe also gzip and upload the rest of the folder (exclusing backups and saves)
+
+def get_last_light_backup_time():
+    if not get_last_light_backup_time.time:
+        client = get_boto_client('s3')
+        response = client.head_object(filename, S3_BUCKET, 'backups/light.zip')
+        get_last_light_backup_time.time = response['LastModified'].timestamp()
+    LOGGER.info('Last backup was {} seconds ago'.format(time.time() - get_last_light_backup_time.time))
+    return get_last_light_backup_time._time
+get_last_light_backup_time._time = None
+
+def save_to_s3(filename, key):
+    LOGGER.info('Uploading {} to s3 at {}'.format(filename, key))
+    client = get_boto_client('s3')
+    client.upload_file(filename, S3_BUCKET, key)
+
 def stop_and_backup_minecraft():
     LOGGER.info('stopping minecraft')
     minecraft = get_minecraft()
     if minecraft.status != "exited":
-        minecraft.exec_run('rcon-cli stop')
+        minecraft.exec_run('rcon-cli stop') #TODO: check output and make sure it was successful
 
     while minecraft.status != "exited":
         minecraft.reload()
@@ -56,10 +92,8 @@ def stop_and_backup_minecraft():
     with tempfile.NamedTemporaryFile() as file:
         with tarfile.open(fileobj=file, mode='w:gz') as tar:
             tar.add(MINECRAFT_DATA)
+            save_to_s3(file.name, key)
 
-        LOGGER.info('Uploading backup to s3 at {}'.format(key))
-        client = get_boto_client('s3')
-        client.upload_file(file.name, S3_BUCKET, key)
 
 def get_instance_details():
     client = get_boto_client('autoscaling')
