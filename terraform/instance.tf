@@ -96,12 +96,33 @@ resource "aws_iam_role_policy" "minecraft" {
           "Action": [
             "s3:GetObject",
             "s3:PutObject",
-            "s3:ListBucket",
+            "s3:ListBucket"
+          ],
+          "Effect": "Allow",
+          "Resource": [
+            "${aws_s3_bucket.minecraft.arn}",
+            "${aws_s3_bucket.minecraft.arn}/*"
+          ]
+        },
+        {
+          "Action": [
             "route53:ChangeResourceRecordSets",
-            "route53:ListResourceRecordSets",
-            "autoscaling:DescribeAutoScalingInstances",
+            "route53:ListResourceRecordSets"
+          ],
+          "Effect": "Allow",
+          "Resource": "arn:aws:route53:::hostedzone/${data.aws_route53_zone.zone.id}"
+        },
+        {
+          "Action": [
             "autoscaling:CompleteLifecycleAction",
             "autoscaling:SetDesiredCapacity"
+          ],
+          "Effect": "Allow",
+          "Resource": "${aws_autoscaling_group.minecraft.arn}"
+        },
+        {
+          "Action": [
+            "autoscaling:DescribeAutoScalingInstances"
           ],
           "Effect": "Allow",
           "Resource": "*"

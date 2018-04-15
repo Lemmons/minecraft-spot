@@ -135,14 +135,7 @@ resource "aws_iam_role_policy" "lambda" {
             "autoscaling:SetDesiredCapacity"
           ],
           "Effect": "Allow",
-          "Resource": "*"
-        },
-        {
-          "Action": [
-            "logs:*"
-          ],
-          "Effect": "Allow",
-          "Resource": "arn:aws:logs:::*"
+          "Resource": "${aws_autoscaling_group.minecraft.arn}"
         }
       ]
     }
