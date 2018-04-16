@@ -74,3 +74,15 @@ variable "no_user_grace_period" {
   description = "the amount of time (in seconds) no user can be present on the server before it terminates itself"
   default = "1800"
 }
+
+variable "auth_token_issuer" {
+  description = "The issuer of the auth token"
+}
+
+variable "auth_jwks_uri" {
+  description = "The URL of the JWKS auth endpoint"
+}
+
+variable "auth_audience" {
+  description = ""
+}
