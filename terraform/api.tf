@@ -136,6 +136,15 @@ resource "aws_iam_role_policy" "lambda" {
           ],
           "Effect": "Allow",
           "Resource": "${aws_autoscaling_group.minecraft.arn}"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          "Resource": "*"
         }
       ]
     }
