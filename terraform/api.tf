@@ -14,7 +14,8 @@ resource "aws_api_gateway_method" "start_get" {
   rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${aws_api_gateway_resource.start.id}"
   http_method   = "GET"
-  authorization = "NONE"
+  authorization = "CUSTOM"
+  authorizer_id = "${aws_api_gateway_authorizer.authorizer.id}"
 }
 
 resource "aws_api_gateway_integration" "start" {
@@ -66,7 +67,8 @@ resource "aws_api_gateway_method" "stop_get" {
   rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${aws_api_gateway_resource.stop.id}"
   http_method   = "GET"
-  authorization = "NONE"
+  authorization = "CUSTOM"
+  authorizer_id = "${aws_api_gateway_authorizer.authorizer.id}"
 }
 
 resource "aws_api_gateway_integration" "stop" {
@@ -184,4 +186,12 @@ resource "aws_api_gateway_deployment" "api" {
 
   rest_api_id = "${aws_api_gateway_rest_api.api.id}"
   stage_name  = "prod"
+
+  variables {
+    version = "0.2"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
