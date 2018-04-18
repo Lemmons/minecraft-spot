@@ -84,5 +84,5 @@ variable "auth_jwks_uri" {
 }
 
 variable "auth_audience" {
-  description = ""
+  description = "The audience of the auth token.  Usually this would be the fqdn of your api, such as https://api.mysite.com"
 }
