@@ -39,25 +39,30 @@ def generate_response_with_cors(event, body=None, headers=None, status_code=200)
     return response
 
 def remove_sensitive_headers(event):
-    del event['headers']['Authorization']
+    if event['headers'].get('Authorization'):
+        del event['headers']['Authorization']
     return event
 
 def is_authorized(scope, method):
     if not scope:
+        LOGGER.info('No scopes found')
         return False
 
     scopes = scope.split(' ')
-    if '{}:server' in scopes:
+    authorized_scope = '{}:server'.format(method)
+
+    if authorized_scope in scopes:
+        LOGGER.info('Authorized: %s found in %s', authorized_scope, scopes)
         return True
+    LOGGER.info('Unauthorized: %s not in %s', authorized_scope, scopes)
     return False
 
 def method_base(event, method):
     remove_sensitive_headers(event)
     LOGGER.info('Event: %s', event)
-    LOGGER.info('Authorization Scopes: %s', event['requestContext']['authorizer']['scope'])
+    LOGGER.info('Authorization Scopes: %s', event['requestContext']['authorizer'].get('scope'))
     if not is_authorized(event['requestContext']['authorizer'].get('scope'), method):
         raise Unauthorized
-
 
 def start(event, context):
     try:
@@ -90,6 +95,46 @@ def stop(event, context):
         HonorCooldown=False,
     )
     return generate_response_with_cors(event, "stopping")
+
+RUNNING_STATES = ['InService']
+STARTING_STATES = ['Pending', 'Pending:Wait', 'Pending:Proceed']
+STOPPING_STATES = ['Terminating', 'Terminating:Proceed']
+def status(event, context):
+    try:
+        method_base(event, 'status')
+    except Unauthorized:
+        return generate_response_with_cors(event, body='Unauthorized', status_code=401)
+
+    LOGGER.info('Getting server status')
+
+    client = boto3.client('autoscaling')
+    group = client.describe_auto_scaling_groups(AutoScalingGroupNames=[os.environ['GROUP_NAME']])['AutoScalingGroups'][0]
+
+    body = {}
+
+    launch_config_name = group['LaunchConfigurationName']
+    body['desired_capacity'] = group['DesiredCapacity']
+
+    # TODO: add latest backups name/date
+
+    starting_instances = [instance for instance in group['Instances'] if instance['LifecycleState'] in STARTING_STATES]
+    running_instances = [instance for instance in group['Instances'] if instance['LifecycleState'] in RUNNING_STATES]
+    stopping_instances = [instance for instance in group['Instances'] if instance['LifecycleState'] in STOPPING_STATES]
+
+    if starting_instances:
+        body['status'] = 'Starting'
+    elif running_instances:
+        body['status'] = 'Running'
+    elif stopping_instances:
+        body['status'] = 'Stopping'
+    else:
+        body['status'] = 'Stopped'
+
+    if body['status'] != 'Running':
+        return generate_response_with_cors(event, json.dumps(body))
+
+    # TODO: get minecraft status from server and add it to the stats
+    return generate_response_with_cors(event, json.dumps(body))
 
 def cors(event, context):
     remove_sensitive_headers(event)

@@ -81,3 +81,9 @@ variable "auth_jwks_uri" {
 variable "auth_audience" {
   description = "The audience of the auth token.  Usually this would be the fqdn of your api, such as https://api.mysite.com"
 }
+
+variable "extra_origins" {
+  description = "Extra origins to add for cors support. Useful for debugging locally, but shouldn't be needed in production"
+  type = "list"
+  default = []
+}

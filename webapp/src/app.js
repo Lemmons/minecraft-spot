@@ -8,7 +8,7 @@ import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 
-import Control from './server';
+import { StartServerButton, StopServerButton, ServerStatus } from './server';
 
 
 const styles = {
@@ -24,82 +24,56 @@ const styles = {
   },
 };
 
-class App extends React.Component {
-  control = new Control(this.props.auth);
+function LoginTitleBar(props) {
+  const { classes } = props;
+  const { isAuthenticated } = props.auth;
 
-  login() {
-    this.props.auth.login();
-  }
+  return (
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="title" color="inherit" className={classes.flex}>
+          Minecraft Spot Controls
+        </Typography>
+        <StartServerButton {...props}/>
+        <StopServerButton {...props}/>
+        {
+          !isAuthenticated() && (
+          <Button
+            color="inherit"
+            onClick={() => props.auth.login()}
+          >
+            Login
+          </Button>
+          )
+        }
+        {
+          isAuthenticated() && (
+          <div>
+            <Button
+              color="inherit"
+              onClick={() => props.auth.logout()}
+            >
+              Logout
+            </Button>
+          </div>
+          )
+        }
+      </Toolbar>
+    </AppBar>
+  );
+}
 
-  logout() {
-    this.props.auth.logout();
-  }
+function App(props) {
+  const { classes } = props;
 
-  start() {
-    this.control.start()
-    console.log('Starting');
-  }
-
-  stop() {
-    this.control.stop()
-    console.log('Stopping');
-  }
-
-  render() {
-    const { classes } = this.props;
-    const { isAuthenticated } = this.props.auth;
-
-    return (
-      <div>
-        <div className={classes.root}>
-          <AppBar position="static">
-            <Toolbar>
-              {/* <IconButton className={classes.menuButton} color="inherit" aria-label="Menu"> */}
-                {/* <MenuIcon /> */}
-              {/* </IconButton> */}
-              <Typography variant="title" color="inherit" className={classes.flex}>
-                Minecraft Spot Controls
-              </Typography>
-              {
-                !isAuthenticated() && (
-                <Button
-                  color="inherit"
-                  onClick={this.login.bind(this)}
-                >
-                  Login
-                </Button>
-                )
-              }
-              {
-                isAuthenticated() && (
-                <div>
-                  <Button
-                    color="inherit"
-                    onClick={this.start.bind(this)}
-                  >
-                    Start Server
-                  </Button>
-                  <Button
-                    color="inherit"
-                    onClick={this.stop.bind(this)}
-                  >
-                    Stop Server
-                  </Button>
-                  <Button
-                    color="inherit"
-                    onClick={this.logout.bind(this)}
-                  >
-                    Logout
-                  </Button>
-                </div>
-                )
-              }
-            </Toolbar>
-          </AppBar>
-        </div>
+  return (
+    <div>
+      <div className={classes.root}>
+        <LoginTitleBar {...props}/>
       </div>
-    );
-  }
+      <ServerStatus {...props}/>
+    </div>
+  );
 }
 
 App.propTypes = {
