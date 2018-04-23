@@ -65,11 +65,6 @@ variable "bucket_name" {
   description = "the name for an s3 bucket which will be created to store game data, both backups and periodic saves"
 }
 
-variable "api_passphrase" {
-  description = "a simple passphrase used to secure the api"
-  default = "abracadabra"
-}
-
 variable "no_user_grace_period" {
   description = "the amount of time (in seconds) no user can be present on the server before it terminates itself"
   default = "1800"

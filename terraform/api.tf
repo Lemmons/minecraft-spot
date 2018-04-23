@@ -10,6 +10,18 @@ resource "aws_api_gateway_resource" "start" {
   rest_api_id = "${aws_api_gateway_rest_api.api.id}"
 }
 
+module "start-cors" {
+  source = "./cors"
+
+  name          = "${var.name_prefix}start"
+  aws_region    = "${var.aws_region}"
+
+  rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
+  resource_id   = "${aws_api_gateway_resource.start.id}"
+  resource_path = "${aws_api_gateway_resource.start.path}"
+  cors_origins  = ["http://localhost"]
+}
+
 resource "aws_api_gateway_method" "start_get" {
   rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${aws_api_gateway_resource.start.id}"
@@ -52,7 +64,6 @@ resource "aws_lambda_function" "start" {
   environment {
     variables = {
       GROUP_NAME = "${aws_autoscaling_group.minecraft.name}"
-      PASSPHRASE = "${var.api_passphrase}"
     }
   }
 }
@@ -61,6 +72,18 @@ resource "aws_api_gateway_resource" "stop" {
   path_part = "stop"
   parent_id = "${aws_api_gateway_rest_api.api.root_resource_id}"
   rest_api_id = "${aws_api_gateway_rest_api.api.id}"
+}
+
+module "stop-cors" {
+  source = "./cors"
+
+  name          = "${var.name_prefix}stop"
+  aws_region    = "${var.aws_region}"
+
+  rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
+  resource_id   = "${aws_api_gateway_resource.stop.id}"
+  resource_path = "${aws_api_gateway_resource.stop.path}"
+  cors_origins  = ["http://localhost"]
 }
 
 resource "aws_api_gateway_method" "stop_get" {
@@ -99,7 +122,6 @@ resource "aws_lambda_function" "stop" {
   environment {
     variables = {
       GROUP_NAME = "${aws_autoscaling_group.minecraft.name}"
-      PASSPHRASE = "${var.api_passphrase}"
     }
   }
 }
@@ -188,7 +210,7 @@ resource "aws_api_gateway_deployment" "api" {
   stage_name  = "prod"
 
   variables {
-    version = "0.2"
+    version = "0.3"
   }
 
   lifecycle {

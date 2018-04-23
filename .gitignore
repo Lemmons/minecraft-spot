@@ -5,4 +5,4 @@ lambda.zip
 node_modules
 dist
 yarn-error.log
-auth0-variables.js
+config.js

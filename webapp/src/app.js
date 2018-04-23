@@ -8,7 +8,7 @@ import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 
-import Auth from './auth.js';
+import Control from './server';
 
 
 const styles = {
@@ -25,12 +25,24 @@ const styles = {
 };
 
 class App extends React.Component {
+  control = new Control(this.props.auth);
+
   login() {
     this.props.auth.login();
   }
 
   logout() {
     this.props.auth.logout();
+  }
+
+  start() {
+    this.control.start()
+    console.log('Starting');
+  }
+
+  stop() {
+    this.control.stop()
+    console.log('Stopping');
   }
 
   render() {
@@ -63,11 +75,13 @@ class App extends React.Component {
                 <div>
                   <Button
                     color="inherit"
+                    onClick={this.start.bind(this)}
                   >
                     Start Server
                   </Button>
                   <Button
                     color="inherit"
+                    onClick={this.stop.bind(this)}
                   >
                     Stop Server
                   </Button>

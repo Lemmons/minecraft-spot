@@ -3,3 +3,7 @@ export const AUTH_CONFIG = {
   clientId: '{CLIENT_ID}',
   callbackUrl: 'http://localhost:3000/callback'
 }
+
+export const API_CONFIG = {
+  api_url: '{API_FQDN}'
+}

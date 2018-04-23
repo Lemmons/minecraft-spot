@@ -1,15 +1,15 @@
 import history from './history';
 import auth0 from 'auth0-js';
-import { AUTH_CONFIG } from './auth0-variables';
+import { AUTH_CONFIG, API_CONFIG } from './config';
 
 export default class Auth {
   auth0 = new auth0.WebAuth({
     domain: AUTH_CONFIG.domain,
     clientID: AUTH_CONFIG.clientId,
     redirectUri: AUTH_CONFIG.callbackUrl,
-    audience: `https://${AUTH_CONFIG.domain}/userinfo`,
+    audience: `${API_CONFIG.api_url}`,
     responseType: 'token id_token',
-    scope: 'openid'
+    scope: 'openid start:server stop:server status:server'
   });
 
   constructor() {
@@ -21,6 +21,14 @@ export default class Auth {
 
   login() {
     this.auth0.authorize();
+  }
+
+  getAccessToken() {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      throw new Error('No access token found');
+    }
+    return accessToken;
   }
 
   handleAuthentication() {
