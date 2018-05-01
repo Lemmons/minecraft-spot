@@ -96,11 +96,16 @@ You can ssh into your instance using your username and ssh key provided in the m
 Additionally you can look at the cloudwatch logs for the lambdas running for potential issues.
 
 ## Future plans
+- Enhance status page:
+  - latest backup time
+  - start backup command
+  - minecraft server address:port
+  - players online
+  - modpack version info
+  - allow upgrade of modpack (text field to input modpack url, button to set the `REMOVE_OLD_MODS="TRUE"` flag?)
 - Add back in option to use api password instead of Auth0
 - Backup system upgrades
     - Periodic backups (not just at shutdown time)
     - Faster shutdown
-- Support modpack version upgrades (~the current backup system doesn't allow upgrades due to it snapshotting the entire minecraft file system~
-  Actually we just need to use the `REMOVE_OLD_MODS="TRUE"` env var when starting the minecraft container.  Still not sure how this should be implemented... probably some how through the api)
 - Add support for vanilla minecraft
 - Ensure minecraft exits when given the command to
