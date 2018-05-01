@@ -25,6 +25,11 @@ variable "minecraft_subdomain" {
   default = "minecraft"
 }
 
+variable "webapp_subdomain" {
+  description = "the subdomain name to run the web application at"
+  default = "app"
+}
+
 variable "domain_ssl_certificate_arn" {
   description = "the api domain's ssl cerficate arn. This MUST match the api name and be created in the us-east-1 (N. Virginia) zone"
 }
@@ -65,11 +70,6 @@ variable "bucket_name" {
   description = "the name for an s3 bucket which will be created to store game data, both backups and periodic saves"
 }
 
-variable "api_passphrase" {
-  description = "a simple passphrase used to secure the api"
-  default = "abracadabra"
-}
-
 variable "no_user_grace_period" {
   description = "the amount of time (in seconds) no user can be present on the server before it terminates itself"
   default = "1800"
@@ -85,4 +85,21 @@ variable "auth_jwks_uri" {
 
 variable "auth_audience" {
   description = "The audience of the auth token.  Usually this would be the fqdn of your api, such as https://api.mysite.com"
+}
+
+variable "extra_origins" {
+  description = "Extra origins to add for cors support. Useful for debugging locally, but shouldn't be needed in production"
+  type = "list"
+  default = []
+}
+
+variable "cloudfront_location_whitelist" {
+  description = "The cloudfront locations to distribute the webapp to"
+  type = "list"
+  default = ["US", "CA", "GB", "DE"]
+}
+
+variable "cloudfront_price_class" {
+  description = "The cloudfront price class to us when distributing the webapp"
+  default = "PriceClass_100"
 }

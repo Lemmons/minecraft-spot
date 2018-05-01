@@ -12,7 +12,7 @@ var getPolicyDocument = function (effect, resource) {
     var statementOne = {};
     statementOne.Action = 'execute-api:Invoke'; // default action
     statementOne.Effect = effect;
-    statementOne.Resource = resource;
+    statementOne.Resource = resource.split("/").slice(0, -2).join("/") + "/*";
     policyDocument.Statement[0] = statementOne;
     return policyDocument;
 }
