@@ -282,7 +282,7 @@ resource "aws_api_gateway_deployment" "api" {
   stage_name  = "prod"
 
   variables {
-    version = "0.4"
+    version = "0.5"
   }
 
   lifecycle {

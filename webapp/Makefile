@@ -21,7 +21,3 @@ serve: build-content
 
 shell: build-docker
 	docker run --rm -it -p 80:80 -v $(shell pwd):/src/app ${REPO}:${TAG} sh
-
-deploy:
-	aws s3 sync dist/ s3://${BUCKET}
-	aws cloudfront create-invalidation --distribution-id ${DIST-ID} --paths /index.html

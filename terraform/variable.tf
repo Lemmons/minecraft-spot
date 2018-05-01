@@ -25,6 +25,11 @@ variable "minecraft_subdomain" {
   default = "minecraft"
 }
 
+variable "webapp_subdomain" {
+  description = "the subdomain name to run the web application at"
+  default = "app"
+}
+
 variable "domain_ssl_certificate_arn" {
   description = "the api domain's ssl cerficate arn. This MUST match the api name and be created in the us-east-1 (N. Virginia) zone"
 }
@@ -86,4 +91,15 @@ variable "extra_origins" {
   description = "Extra origins to add for cors support. Useful for debugging locally, but shouldn't be needed in production"
   type = "list"
   default = []
+}
+
+variable "cloudfront_location_whitelist" {
+  description = "The cloudfront locations to distribute the webapp to"
+  type = "list"
+  default = ["US", "CA", "GB", "DE"]
+}
+
+variable "cloudfront_price_class" {
+  description = "The cloudfront price class to us when distributing the webapp"
+  default = "PriceClass_100"
 }
