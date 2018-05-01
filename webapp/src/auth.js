@@ -9,7 +9,7 @@ export default class Auth {
     redirectUri: AUTH_CONFIG.callbackUrl,
     audience: `${API_CONFIG.api_url}`,
     responseType: 'token id_token',
-    scope: 'openid start:server stop:server status:server'
+    scope: 'openid groups start:server stop:server status:server'
   });
 
   constructor() {
@@ -39,6 +39,7 @@ export default class Auth {
       } else if (err) {
         history.replace('/');
         console.log(err);
+        localStorage.setItem('access_error', err.errorDescription);
       }
     });
   }
@@ -49,6 +50,7 @@ export default class Auth {
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('expires_at', expiresAt);
+    localStorage.removeItem('access_error');
     // navigate to the home route
     history.replace('/');
   }
@@ -58,6 +60,7 @@ export default class Auth {
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
+    localStorage.removeItem('access_error');
     // navigate to the home route
     history.replace('/');
   }
@@ -67,5 +70,17 @@ export default class Auth {
     // Access Token's expiry time
     let expiresAt = JSON.parse(localStorage.getItem('expires_at'));
     return new Date().getTime() < expiresAt;
+  }
+
+  hasError(){
+    let error = localStorage.getItem('access_error');
+    if (error) {
+      return error;
+    }
+    return false;
+  }
+
+  clearError(){
+    localStorage.removeItem('access_error');
   }
 }

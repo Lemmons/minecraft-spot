@@ -7,8 +7,10 @@ import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import IconButton from 'material-ui/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
+import Snackbar from 'material-ui/Snackbar';
+import red from 'material-ui/colors/red';
 
-import { StartServerButton, StopServerButton, ServerStatus } from './server';
+import ServerStatus from './server';
 
 
 const styles = {
@@ -22,6 +24,10 @@ const styles = {
     marginLeft: -12,
     marginRight: 20,
   },
+  error: {
+    color: 'white',
+    backgroundColor: red[900],
+  }
 };
 
 function LoginTitleBar(props) {
@@ -34,11 +40,10 @@ function LoginTitleBar(props) {
         <Typography variant="title" color="inherit" className={classes.flex}>
           Minecraft Spot Controls
         </Typography>
-        <StartServerButton {...props}/>
-        <StopServerButton {...props}/>
         {
           !isAuthenticated() && (
           <Button
+            className={classes.menuButton}
             color="inherit"
             onClick={() => props.auth.login()}
           >
@@ -50,6 +55,7 @@ function LoginTitleBar(props) {
           isAuthenticated() && (
           <div>
             <Button
+              className={classes.menuButton}
               color="inherit"
               onClick={() => props.auth.logout()}
             >
@@ -63,17 +69,43 @@ function LoginTitleBar(props) {
   );
 }
 
-function App(props) {
-  const { classes } = props;
+class App extends React.Component {
+  state = {
+    open: true
+  }
 
-  return (
-    <div>
-      <div className={classes.root}>
-        <LoginTitleBar {...props}/>
+  handleCloseError() {
+    this.setState({ open: false });
+    this.props.auth.clearError();
+  };
+
+  render(){
+    const { classes, ...others } = this.props;
+    return (
+      <div>
+        <div className={classes.root}>
+          <LoginTitleBar {...this.props}/>
+        </div>
+        { this.props.auth.hasError() && (
+          <Snackbar
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            message={this.props.auth.hasError()}
+            open={this.state.open}
+            onClose={this.handleCloseError.bind(this)}
+            SnackbarContentProps={{
+              className: classes.error,
+            }}
+          />
+          )
+        }
+        {
+          this.props.auth.isAuthenticated() && (
+            <ServerStatus {...others}/>
+          )
+        }
       </div>
-      <ServerStatus {...props}/>
-    </div>
-  );
+    );
+  }
 }
 
 App.propTypes = {
