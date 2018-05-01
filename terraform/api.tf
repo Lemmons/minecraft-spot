@@ -19,8 +19,7 @@ module "start-cors" {
   rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${aws_api_gateway_resource.start.id}"
   resource_path = "${aws_api_gateway_resource.start.path}"
-  cors_origins  = "${concat(var.extra_origins, list())}"
-  // cors_origins  = ${concat(var.extra_origins, ["https://${cloudfront_domainname}"])}
+  cors_origins  = "${concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}"))}"
 }
 
 resource "aws_api_gateway_method" "start_get" {
@@ -65,7 +64,7 @@ resource "aws_lambda_function" "start" {
   environment {
     variables = {
       GROUP_NAME = "${aws_autoscaling_group.minecraft.name}"
-      CORS_ORIGINS = "${join(",", concat(var.extra_origins, list()))}"
+      CORS_ORIGINS = "${join(",", concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}")))}"
     }
   }
 }
@@ -85,7 +84,7 @@ module "stop-cors" {
   rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${aws_api_gateway_resource.stop.id}"
   resource_path = "${aws_api_gateway_resource.stop.path}"
-  cors_origins  = "${concat(var.extra_origins, list())}"
+  cors_origins  = "${concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}"))}"
 }
 
 resource "aws_api_gateway_method" "stop_get" {
@@ -124,7 +123,7 @@ resource "aws_lambda_function" "stop" {
   environment {
     variables = {
       GROUP_NAME = "${aws_autoscaling_group.minecraft.name}"
-      CORS_ORIGINS = "${join(",", concat(var.extra_origins, list()))}"
+      CORS_ORIGINS = "${join(",", concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}")))}"
     }
   }
 }
@@ -144,7 +143,7 @@ module "status-cors" {
   rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${aws_api_gateway_resource.status.id}"
   resource_path = "${aws_api_gateway_resource.status.path}"
-  cors_origins  = "${concat(var.extra_origins, list())}"
+  cors_origins  = "${concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}"))}"
 }
 
 resource "aws_api_gateway_method" "status_get" {
@@ -183,7 +182,7 @@ resource "aws_lambda_function" "status" {
   environment {
     variables = {
       GROUP_NAME = "${aws_autoscaling_group.minecraft.name}"
-      CORS_ORIGINS = "${join(",", concat(var.extra_origins, list()))}"
+      CORS_ORIGINS = "${join(",", concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}")))}"
     }
   }
 }

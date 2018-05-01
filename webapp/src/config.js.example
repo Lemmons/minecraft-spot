@@ -1,9 +1,9 @@
 export const AUTH_CONFIG = {
-  domain: '{DOMAIN}',
+  domain: '{AUTH_DOMAIN}',
   clientId: '{CLIENT_ID}',
-  callbackUrl: 'http://localhost:3000/callback'
+  callbackUrl: 'https://{APP_DOMAIN}/callback'
 }
 
 export const API_CONFIG = {
-  api_url: '{API_FQDN}'
+  api_url: 'https://{API_DOMAIN}'
 }
