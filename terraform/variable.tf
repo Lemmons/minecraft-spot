@@ -36,7 +36,7 @@ variable "domain_ssl_certificate_arn" {
 
 variable "tools_docker_image_id" {
   description = "the docker image with the tools for checking and changing status of the server"
-  default = "tlemmon/minecraft-spot-tools:0.6"
+  default = "tlemmon/minecraft-spot-tools:0.7"
 }
 
 variable "aws_region" {
