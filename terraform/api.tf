@@ -10,11 +10,24 @@ resource "aws_api_gateway_resource" "start" {
   rest_api_id = "${aws_api_gateway_rest_api.api.id}"
 }
 
+module "start-cors" {
+  source = "./cors"
+
+  name          = "${var.name_prefix}start"
+  aws_region    = "${var.aws_region}"
+
+  rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
+  resource_id   = "${aws_api_gateway_resource.start.id}"
+  resource_path = "${aws_api_gateway_resource.start.path}"
+  cors_origins  = "${concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}"))}"
+}
+
 resource "aws_api_gateway_method" "start_get" {
   rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${aws_api_gateway_resource.start.id}"
   http_method   = "GET"
-  authorization = "NONE"
+  authorization = "CUSTOM"
+  authorizer_id = "${aws_api_gateway_authorizer.authorizer.id}"
 }
 
 resource "aws_api_gateway_integration" "start" {
@@ -51,7 +64,7 @@ resource "aws_lambda_function" "start" {
   environment {
     variables = {
       GROUP_NAME = "${aws_autoscaling_group.minecraft.name}"
-      PASSPHRASE = "${var.api_passphrase}"
+      CORS_ORIGINS = "${join(",", concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}")))}"
     }
   }
 }
@@ -62,11 +75,24 @@ resource "aws_api_gateway_resource" "stop" {
   rest_api_id = "${aws_api_gateway_rest_api.api.id}"
 }
 
+module "stop-cors" {
+  source = "./cors"
+
+  name          = "${var.name_prefix}stop"
+  aws_region    = "${var.aws_region}"
+
+  rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
+  resource_id   = "${aws_api_gateway_resource.stop.id}"
+  resource_path = "${aws_api_gateway_resource.stop.path}"
+  cors_origins  = "${concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}"))}"
+}
+
 resource "aws_api_gateway_method" "stop_get" {
   rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${aws_api_gateway_resource.stop.id}"
   http_method   = "GET"
-  authorization = "NONE"
+  authorization = "CUSTOM"
+  authorizer_id = "${aws_api_gateway_authorizer.authorizer.id}"
 }
 
 resource "aws_api_gateway_integration" "stop" {
@@ -97,7 +123,66 @@ resource "aws_lambda_function" "stop" {
   environment {
     variables = {
       GROUP_NAME = "${aws_autoscaling_group.minecraft.name}"
-      PASSPHRASE = "${var.api_passphrase}"
+      CORS_ORIGINS = "${join(",", concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}")))}"
+    }
+  }
+}
+
+resource "aws_api_gateway_resource" "status" {
+  path_part = "status"
+  parent_id = "${aws_api_gateway_rest_api.api.root_resource_id}"
+  rest_api_id = "${aws_api_gateway_rest_api.api.id}"
+}
+
+module "status-cors" {
+  source = "./cors"
+
+  name          = "${var.name_prefix}status"
+  aws_region    = "${var.aws_region}"
+
+  rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
+  resource_id   = "${aws_api_gateway_resource.status.id}"
+  resource_path = "${aws_api_gateway_resource.status.path}"
+  cors_origins  = "${concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}"))}"
+}
+
+resource "aws_api_gateway_method" "status_get" {
+  rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
+  resource_id   = "${aws_api_gateway_resource.status.id}"
+  http_method   = "GET"
+  authorization = "CUSTOM"
+  authorizer_id = "${aws_api_gateway_authorizer.authorizer.id}"
+}
+
+resource "aws_api_gateway_integration" "status" {
+  rest_api_id             = "${aws_api_gateway_rest_api.api.id}"
+  resource_id             = "${aws_api_gateway_resource.status.id}"
+  http_method             = "${aws_api_gateway_method.status_get.http_method}"
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.status.arn}/invocations"
+}
+
+resource "aws_lambda_permission" "status" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.status.arn}"
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api.id}/*/${aws_api_gateway_method.status_get.http_method}${aws_api_gateway_resource.status.path}"
+}
+
+resource "aws_lambda_function" "status" {
+  filename         = "${data.archive_file.lambda.output_path}"
+  function_name    = "status_minecraft"
+  role             = "${aws_iam_role.lambda.arn}"
+  handler          = "lambda.status"
+  runtime          = "python3.6"
+  source_code_hash = "${base64sha256(file("${data.archive_file.lambda.output_path}"))}"
+  environment {
+    variables = {
+      GROUP_NAME = "${aws_autoscaling_group.minecraft.name}"
+      CORS_ORIGINS = "${join(",", concat(var.extra_origins, list("https://${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}")))}"
     }
   }
 }
@@ -135,14 +220,23 @@ resource "aws_iam_role_policy" "lambda" {
             "autoscaling:SetDesiredCapacity"
           ],
           "Effect": "Allow",
-          "Resource": "*"
+          "Resource": "${aws_autoscaling_group.minecraft.arn}"
         },
         {
           "Action": [
-            "logs:*"
+            "autoscaling:DescribeAutoScalingGroups"
           ],
           "Effect": "Allow",
-          "Resource": "arn:aws:logs:::*"
+          "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          "Resource": "*"
         }
       ]
     }
@@ -178,8 +272,19 @@ resource "aws_api_gateway_base_path_mapping" "minecraft" {
 }
 
 resource "aws_api_gateway_deployment" "api" {
-  depends_on = ["aws_api_gateway_method.start_get", "aws_api_gateway_method.stop_get"]
+  depends_on = [
+    "aws_api_gateway_method.start_get",
+    "aws_api_gateway_method.stop_get",
+    "aws_api_gateway_method.status_get"]
 
   rest_api_id = "${aws_api_gateway_rest_api.api.id}"
   stage_name  = "prod"
+
+  variables {
+    version = "0.5"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }

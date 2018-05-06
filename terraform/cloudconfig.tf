@@ -28,6 +28,7 @@ data "template_file" "minecraft" {
       - python3-pip
     runcmd:
       - mkdir -p /srv/minecraft-spot/data
+      - chmod 777 /srv/minecraft-spot/data
       - pip3 install awscli
       - aws configure set region ${var.aws_region}
       - docker run --name set_route -e AWS_DEFAULT_REGION=${var.aws_region} -e FQDN=${var.minecraft_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")} -e S3_BUCKET=${var.bucket_name} -e ZONE_ID=${var.hosted_zone_id} ${var.tools_docker_image_id} set_route.py

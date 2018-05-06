@@ -1,3 +1,10 @@
 plan.out
 .terraform
 lambda.zip
+
+node_modules
+dist
+yarn-error.log
+config.js
+
+deploy-filled.sh
