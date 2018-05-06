@@ -224,10 +224,18 @@ resource "aws_iam_role_policy" "lambda" {
         },
         {
           "Action": [
-            "autoscaling:DescribeAutoScalingGroups"
+            "autoscaling:DescribeAutoScalingGroups",
+            "autoscaling:DescribeLaunchConfigurations"
           ],
           "Effect": "Allow",
           "Resource": "*"
+        },
+        {
+          "Action": [
+            "s3:GetObject"
+          ],
+          "Effect": "Allow",
+          "Resource": "${aws_s3_bucket.minecraft.arn}/backups/latest.tgz"
         },
         {
           "Effect": "Allow",
