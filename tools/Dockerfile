@@ -4,4 +4,9 @@ COPY requirements.txt requirements.txt
 
 RUN pip install -r requirements.txt
 
-COPY *.py /usr/local/bin/
+RUN mkdir -p /srv/spot_tools/
+
+COPY *.py /srv/spot_tools/
+COPY bin/*.py /usr/local/bin/
+
+ENV PYTHONPATH /srv/spot_tools/
