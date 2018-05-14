@@ -30,7 +30,7 @@ data "template_file" "minecraft" {
       - mkdir -p /srv/minecraft-spot/data
       - pip3 install awscli
       - aws configure set region ${var.aws_region}
-      - docker run --name set_route -e AWS_DEFAULT_REGION=${var.aws_region} -e FQDN=${var.minecraft_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")} -e S3_BUCKET=${var.bucket_name} -e ZONE_ID=${var.hosted_zone_id} ${var.tools_docker_image_id} set_route.py
+      - docker run --name set_route -e AWS_DEFAULT_REGION=${var.aws_region} -e FQDN=${var.minecraft_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")} -e ZONE_ID=${var.hosted_zone_id} ${var.tools_docker_image_id} set_route.py
       - docker run --name restore_backup -e AWS_DEFAULT_REGION=${var.aws_region} -e S3_BUCKET=${var.bucket_name} -v /srv/minecraft-spot/data:/data ${var.tools_docker_image_id} restore_backup.py
       - chmod -R a+rwX /srv/minecraft-spot/data
       - docker-compose -f /srv/minecraft-spot/docker-compose.yaml up -d

@@ -11,8 +11,6 @@ import spot_tools.logger
 spot_tools.logger.setup_logging()
 LOGGER = logging.getLogger(__name__)
 
-MINECRAFT_DATA = '/data'
-S3_BUCKET = os.environ.get('S3_BUCKET')
 ZONE_ID = os.environ.get('ZONE_ID')
 FQDN = os.environ.get('FQDN')
 
