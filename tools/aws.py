@@ -19,5 +19,6 @@ def save_to_s3(filename, bucket, key):
     client.upload_file(filename, bucket, key)
 
 def download_from_s3(filename, bucket, key):
+    LOGGER.info('Downloading {} from s3 to {}'.format(key, filename))
     client = get_boto_client('s3')
     client.download_file(bucket, key, filename)

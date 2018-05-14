@@ -8,7 +8,6 @@ import requests
 
 import spot_tools.aws
 import spot_tools.backup
-import spot_tools.constants
 import spot_tools.logger
 import spot_tools.minecraft
 
@@ -28,6 +27,17 @@ def get_automatic_termination_time():
         return
     return response.text
 
+def stop_and_backup_minecraft():
+    spot_tools.backup.local_backup_and_save_to_s3()
+
+    LOGGER.info('stopping minecraft')
+    minecraft = spot_tools.minecraft.get_minecraft()
+
+    if minecraft.status != "exited":
+        minecraft.exec_run('rcon-cli stop')
+
+    spot_tools.backup.others_backup_if_needed()
+
 def run():
     terminate = False
     instance_details = get_instance_details()
@@ -35,7 +45,7 @@ def run():
     manual_termination = 'Terminating' in instance_details['LifecycleState']
 
     if automatic_termination_time or manual_termination:
-        spot_tools.minecraft.stop_and_backup_minecraft()
+        stop_and_backup_minecraft()
         terminate = True
 
     if manual_termination:

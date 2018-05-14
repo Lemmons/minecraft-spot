@@ -28,11 +28,3 @@ get_minecraft._container = None
 
 def get_minecraft_health():
     return get_docker_lowlevel_client().inspect_container('minecraft')['State']['Health']
-
-def stop_and_backup_minecraft():
-    spot_tools.backup.local_backup_and_save_to_s3()
-
-    LOGGER.info('stopping minecraft')
-    minecraft = get_minecraft()
-    if minecraft.status != "exited":
-        minecraft.exec_run('rcon-cli stop')

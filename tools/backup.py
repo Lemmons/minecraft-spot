@@ -14,9 +14,11 @@ LOGGER = logging.getLogger(__name__)
 
 MINECRAFT_DATA = '/data'
 BACKUPS_PATH = os.path.join(MINECRAFT_DATA, 'FeedTheBeast/backups')
+WORLD_PATH = os.path.join(MINECRAFT_DATA, 'FeedTheBeast/world')
 BACKUP_S3_KEY = 'backups/latest.zip'
-# BACKUP_S3_KEY = 'backups/latest.tgz'
+LEGACY_BACKUP_S3_KEY = 'backups/latest.tgz'
 PREVIOUS_BACKUP_S3_KEY = 'backups/previous.zip'
+OTHERS_BACKUP_S3_KEY = 'backups/others.tgz'
 S3_BUCKET = os.environ.get('S3_BUCKET')
 
 def get_latest_local_backup():
@@ -44,10 +46,30 @@ def get_latest_s3_backup_time():
     return get_latest_s3_backup_time._time
 get_latest_s3_backup_time._time = None
 
+def get_legacy_s3_backup_time():
+    if not get_legacy_s3_backup_time.time:
+        client = spot_tools.aws.get_boto_client('s3')
+        response = client.head_object(Bucket=S3_BUCKET, Key=LEGACY_BACKUP_S3_KEY)
+        get_legacy_s3_backup_time.time = response['LastModified'].timestamp()
+        # need to catch the case where this file doesn't exist
+    LOGGER.info('Last s3 backup was {} seconds ago'.format(time.time() - get_legacy_s3_backup_time.time))
+    return get_legacy_s3_backup_time._time
+get_legacy_s3_backup_time._time = None
+
+def get_others_s3_backup_time():
+    if not get_others_s3_backup_time.time:
+        client = spot_tools.aws.get_boto_client('s3')
+        response = client.head_object(Bucket=S3_BUCKET, Key=OTHERS_BACKUP_S3_KEY)
+        get_others_s3_backup_time.time = response['LastModified'].timestamp()
+        # need to catch the case where this file doesn't exist
+    LOGGER.info('Last s3 backup was {} seconds ago'.format(time.time() - get_others_s3_backup_time.time))
+    return get_others_s3_backup_time._time
+get_others_s3_backup_time._time = None
+
 def local_backup():
     minecraft = spot_tools.minecraft.get_minecraft()
     if minecraft.status == "exited" or spot_tools.minecraft.get_minecraft_health() != "healthy":
-        raise "cannot backup, minecraft not running"
+        raise spot_tools.errors.UnableToBackupError("cannot backup, minecraft not running")
 
     LOGGER.info('backing-up minecraft locally')
     last_backup_time = get_latest_local_backup_time()
@@ -62,7 +84,6 @@ def local_backup():
     LOGGER.info('completed backing-up minecraft locally')
 
 def local_backup_and_save_to_s3():
-    #TODO: maybe also gzip and upload the rest of the folder (excluding backups and saves)
     local_backup()
 
     LOGGER.info('saving minecraft backup to s3')
@@ -73,20 +94,20 @@ def local_backup_and_save_to_s3():
     get_latest_s3_backup_time._time = time.time()
 
 def others_backup_if_needed():
-    #### this should only happen if backups/others.tgz doesn't already exist in s3 (never was made or recently was deleted)
-    # LOGGER.info('backing up minecraft')
-    # key = "backups/others.tgz"
-    # with tempfile.NamedTemporaryFile() as file:
-    #     with tarfile.open(fileobj=file, mode='w:gz') as tar:
-            # tar.add(MINECRAFT_DATA,
-            #     excludes=[
-            #         '*.zip',
-            #         'FeedTheBeast/world',
-            #         'FeedTheBeast/backups',
-            #     ]
-            # )
+    if not get_others_s3_backup_time():
+        LOGGER.info('backing up non-save minecraft dirs')
+        with tempfile.NamedTemporaryFile() as file:
+            with tarfile.open(fileobj=file, mode='w:gz') as tar:
+                tar.add(MINERAFT_DATA,
+                    excludes=[
+                        '*.zip',
+                        '*.tgz',
+                        'FeedTheBeast/world',
+                        'FeedTheBeast/backups',
+                    ]
+                )
 
-    #         save_to_s3(file.name, key)
+            spot_tools.aws.save_to_s3(file.name, OTHERS_BACKUP_S3_KEY)
 
 def backup_if_needed():
     if (time.time() - get_latest_s3_backup_time()) > (20 * 60): # 20 minutes
@@ -97,32 +118,38 @@ def restore_backup():
     # TODO: this is super jank and should be cleaned up
     try:
         minecraft = spot_tools.minecraft.get_minecraft()
-        raise spot_tools.UnableToRestoreError("Cannot restore backup when in state {}".format(minecraft.state))
-    except spot_tools.UnableToRestoreError:
+        raise spot_tools.errors.UnableToRestoreError("Cannot restore backup when in state {}".format(minecraft.state))
+    except spot_tools.errors.UnableToRestoreError:
         raise
     except:
         pass
 
-    #### restore others (main mod contents) if exists
-    # key = "backups/others.tgz"
-    # LOGGER.info('Restoring backup from {}'.format(key))
-    # with tempfile.NamedTemporaryFile() as file:
-    #     LOGGER.info('Downloading {} to {}'.format(key_latest, file.name))
-    #     client.download_fileobj(S3_BUCKET, key_latest, file)
-    #     with tarfile.open(name=file.name, mode='r') as tar:
-    #         LOGGER.info('Un-taring {} to {}'.format(file.name, MINECRAFT_DATA))
-    #         tar.extractall(MINECRAFT_DATA + '/..')
+    if get_legacy_s3_backup_time() and not get_latest_s3_backup_time():
+        LOGGER.info('Restoring legacy backup from {}'.format(LEGACY_BACKUP_S3_KEY))
+        filename = '/tmp/latest.tgz'
+        LOGGER.info('Downloading {} to {}'.format(LEGACY_BACKUP_S3_KEY, filename))
+        spot_tools.aws.download_from_s3(filename, S3_BUCKET, LEGACY_BACKUP_S3_KEY)
+        with tarfile.open(name=filename, mode='r') as tar:
+            LOGGER.info('Un-taring {} to {}'.format(file.name, MINECRAFT_DATA))
+            tar.extractall(MINECRAFT_DATA + '/..')
+        return
+
+    LOGGER.info('Restoring backup of non-save minecraft dirs from {}'.format(OTHERS_BACKUP_S3_KEY))
+    filename = '/tmp/other.tgz'
+    LOGGER.info('Downloading {} to {}'.format(OTHERS_BACKUP_S3_KEY, filename))
+    spot_tools.aws.download_from_s3(filename, S3_BUCKET, OTHERS_BACKUP_S3_KEY)
+    with tarfile.open(name=filename, mode='r') as tar:
+        LOGGER.info('Un-taring {} to {}'.format(file.name, MINECRAFT_DATA))
+        tar.extractall(MINECRAFT_DATA + '/..')
 
     LOGGER.info('Restoring backup from {}'.format(BACKUP_S3_KEY))
-
     filename = '/tmp/latest.zip'
     LOGGER.info('Downloading {} to {}'.format(BACKUP_S3_KEY, filename))
     spot_tools.aws.download_from_s3(filename, S3_BUCKET, BACKUP_S3_KEY)
 
     with zipfile.ZipFile(filename) as _zip:
-        world_path = os.path.join(MINECRAFT_DATA, 'FeedTheBeast/world/') # not sure if this is the correct location
-        LOGGER.info('Un-zipping {} to {}'.format(filename, world_path))
-        _zip.extractall(world_path)
+        LOGGER.info('Un-zipping {} to {}'.format(filename, WORLD_PATH))
+        _zip.extractall(WORLD_PATH)
 
     LOGGER.info('Saving previous backup to {}'.format(PREVIOUS_BACKUP_S3_KEY))
-    spot_tool.aws.save_to_s3(filename, S3_BUCKET, PREVIOUS_BACKUP_S3_KEY)
+    spot_tools.aws.save_to_s3(filename, S3_BUCKET, PREVIOUS_BACKUP_S3_KEY)
