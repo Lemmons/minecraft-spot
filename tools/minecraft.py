@@ -27,4 +27,4 @@ def get_minecraft():
 get_minecraft._container = None
 
 def get_minecraft_health():
-    return get_docker_lowlevel_client().inspect_container('minecraft')['State']['Health']
+    return get_docker_lowlevel_client().inspect_container('minecraft')['State']['Health']['Status']

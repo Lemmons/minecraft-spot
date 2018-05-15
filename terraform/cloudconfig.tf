@@ -43,7 +43,7 @@ data "template_file" "minecraft" {
           services:
             minecraft:
               container_name: minecraft
-              image: itzg/minecraft-server
+              image: ${var.minecraft_docker_image_id}
               restart: on-failure
               ports:
                 - 25565:25565

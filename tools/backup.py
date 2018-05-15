@@ -1,8 +1,12 @@
 import json
+import logging
 import os
 import os.path
+import tarfile
 import time
 import zipfile
+
+import botocore.exceptions
 
 import spot_tools.aws
 import spot_tools.errors
@@ -36,35 +40,30 @@ def get_latest_local_backup_time():
         LOGGER.warning('Could not find previous local backup')
         return 0
 
-def get_latest_s3_backup_time():
-    if not get_latest_s3_backup_time.time:
+def get_backup_time(backup_type, key):
+    if get_backup_time._time.get(backup_type) is None:
         client = spot_tools.aws.get_boto_client('s3')
-        response = client.head_object(Bucket=S3_BUCKET, Key=BACKUP_S3_KEY)
-        get_latest_s3_backup_time.time = response['LastModified'].timestamp()
-        # need to catch the case where this file doesn't exist
-    LOGGER.info('Last s3 backup was {} seconds ago'.format(time.time() - get_latest_s3_backup_time.time))
-    return get_latest_s3_backup_time._time
-get_latest_s3_backup_time._time = None
+        try:
+            response = client.head_object(Bucket=S3_BUCKET, Key=key)
+            get_backup_time._time[backup_type] = response['LastModified'].timestamp()
+        except botocore.exceptions.ClientError as e:
+            if int(e.response['Error']['Code']) == 404:
+                get_backup_time._time[backup_type] = 0
+                LOGGER.warning('{} never backed up to s3'.format(backup_type))
+                return get_backup_time._time[backup_type]
+            raise
+    LOGGER.info('Last {} s3 backup was {} seconds ago'.format(backup_type, time.time() - get_backup_time._time[backup_type]))
+    return get_backup_time._time[backup_type]
+get_backup_time._time = {}
+
+def get_latest_s3_backup_time():
+    return get_backup_time('latest', BACKUP_S3_KEY)
 
 def get_legacy_s3_backup_time():
-    if not get_legacy_s3_backup_time.time:
-        client = spot_tools.aws.get_boto_client('s3')
-        response = client.head_object(Bucket=S3_BUCKET, Key=LEGACY_BACKUP_S3_KEY)
-        get_legacy_s3_backup_time.time = response['LastModified'].timestamp()
-        # need to catch the case where this file doesn't exist
-    LOGGER.info('Last s3 backup was {} seconds ago'.format(time.time() - get_legacy_s3_backup_time.time))
-    return get_legacy_s3_backup_time._time
-get_legacy_s3_backup_time._time = None
+    return get_backup_time('legacy', LEGACY_BACKUP_S3_KEY)
 
 def get_others_s3_backup_time():
-    if not get_others_s3_backup_time.time:
-        client = spot_tools.aws.get_boto_client('s3')
-        response = client.head_object(Bucket=S3_BUCKET, Key=OTHERS_BACKUP_S3_KEY)
-        get_others_s3_backup_time.time = response['LastModified'].timestamp()
-        # need to catch the case where this file doesn't exist
-    LOGGER.info('Last s3 backup was {} seconds ago'.format(time.time() - get_others_s3_backup_time.time))
-    return get_others_s3_backup_time._time
-get_others_s3_backup_time._time = None
+    return get_backup_time('others', OTHERS_BACKUP_S3_KEY)
 
 def local_backup():
     minecraft = spot_tools.minecraft.get_minecraft()
@@ -91,7 +90,7 @@ def local_backup_and_save_to_s3():
     latest_backup = get_latest_local_backup()
     spot_tools.aws.save_to_s3(os.path.join(BACKUPS_PATH, latest_backup['file']), S3_BUCKET, BACKUP_S3_KEY)
 
-    get_latest_s3_backup_time._time = time.time()
+    get_backup_time._time['latest'] = time.time()
 
 def others_backup_if_needed():
     if not get_others_s3_backup_time():
@@ -130,7 +129,7 @@ def restore_backup():
         LOGGER.info('Downloading {} to {}'.format(LEGACY_BACKUP_S3_KEY, filename))
         spot_tools.aws.download_from_s3(filename, S3_BUCKET, LEGACY_BACKUP_S3_KEY)
         with tarfile.open(name=filename, mode='r') as tar:
-            LOGGER.info('Un-taring {} to {}'.format(file.name, MINECRAFT_DATA))
+            LOGGER.info('Un-taring {} to {}'.format(filename, MINECRAFT_DATA))
             tar.extractall(MINECRAFT_DATA + '/..')
         return
 
@@ -139,7 +138,7 @@ def restore_backup():
     LOGGER.info('Downloading {} to {}'.format(OTHERS_BACKUP_S3_KEY, filename))
     spot_tools.aws.download_from_s3(filename, S3_BUCKET, OTHERS_BACKUP_S3_KEY)
     with tarfile.open(name=filename, mode='r') as tar:
-        LOGGER.info('Un-taring {} to {}'.format(file.name, MINECRAFT_DATA))
+        LOGGER.info('Un-taring {} to {}'.format(filename, MINECRAFT_DATA))
         tar.extractall(MINECRAFT_DATA + '/..')
 
     LOGGER.info('Restoring backup from {}'.format(BACKUP_S3_KEY))

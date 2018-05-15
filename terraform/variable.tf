@@ -39,6 +39,11 @@ variable "tools_docker_image_id" {
   default = "tlemmon/minecraft-spot-tools:0.7"
 }
 
+variable "minecraft_docker_image_id" {
+  description = "the minecraft-server docker image to use"
+  default = "tlemmon/minecraft-server:0.1"
+}
+
 variable "aws_region" {
   description = "the aws region the server is running in"
 }
