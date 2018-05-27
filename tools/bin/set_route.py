@@ -2,31 +2,22 @@
 
 import logging
 import os
-import sys
-import tarfile
-import tempfile
 
-import boto3
 import requests
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-LOGGER = logging.getLogger('set_route.py')
+import spot_tools.aws
+import spot_tools.logger
 
-MINECRAFT_DATA = '/data'
-S3_BUCKET = os.environ.get('S3_BUCKET')
+spot_tools.logger.setup_logging()
+LOGGER = logging.getLogger(__name__)
+
 ZONE_ID = os.environ.get('ZONE_ID')
 FQDN = os.environ.get('FQDN')
-
-def get_boto_client(service):
-    if not get_boto_client._clients.get(service):
-        get_boto_client._clients[service] = boto3.client(service)
-    return get_boto_client._clients[service]
-get_boto_client._clients = {}
 
 def main():
     ip_address = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4').text
 
-    client = get_boto_client('route53')
+    client = spot_tools.aws.get_boto_client('route53')
     change_batch = {'Changes': [
         {
             'Action': 'UPSERT',

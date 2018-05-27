@@ -5,35 +5,21 @@ import os
 import time
 import re
 
-import boto3
-import docker
 import requests
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-LOGGER = logging.getLogger('check_players.py')
+import spot_tools.aws
+import spot_tools.logger
+import spot_tools.minecraft
+
+spot_tools.logger.setup_logging()
+LOGGER = logging.getLogger(__name__)
 
 GRACE_PERIOD = int(os.environ['GRACE_PERIOD'])
 
-def get_boto_client(service):
-    if not get_boto_client._clients.get(service):
-        get_boto_client._clients[service] = boto3.client(service)
-    return get_boto_client._clients[service]
-get_boto_client._clients = {}
-
-def get_docker_client():
-    if not get_docker_client._client:
-        get_docker_client._client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-    return get_docker_client._client
-get_docker_client._client = None
-
-def get_minecraft():
-    if not get_minecraft._container:
-        get_minecraft._container = get_docker_client().containers.get('minecraft')
-    return get_minecraft._container
-get_minecraft._container = None
-
 def mark_instance_for_removal():
-    client = boto3.client('autoscaling')
+    LOGGER.info('Marking intance for removal')
+
+    client = spot_tools.aws.get_boto_client('autoscaling')
 
     instance_id = requests.get('http://169.254.169.254/latest/meta-data/instance-id').text
     instance_details = client.describe_auto_scaling_instances(InstanceIds=[instance_id])['AutoScalingInstances'][0]
@@ -46,7 +32,7 @@ def mark_instance_for_removal():
 
 PLAYERS_RE = re.compile(r'There are (?P<players>\d*)/\d* players online:')
 def get_players():
-    minecraft = get_minecraft()
+    minecraft = spot_tools.minecraft.get_minecraft()
     if minecraft.status == "exited":
         return
 

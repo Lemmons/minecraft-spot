@@ -88,7 +88,11 @@ To deploy, from the `webapp/` directory run `./deploy.sh app.<your_domain> <weba
 
 ### Testing
 
-You can run locally with `make run`.  This will bring up a deveoplment webserver at `http://localhost` on your machine.  You can use this to test changes as needed.  Keep in mind you will need to modify the `callbackUrl` in `webapp/src/config.js` to point to `http://localhost/callback` to fully work.
+You can run locally with `make run`.  This will bring up a development webserver at `http://localhost` on your machine.  You can use this to test changes as needed.  Keep in mind you will need to modify the `callbackUrl` in `webapp/src/config.js` to point to `http://localhost/callback` to fully work.
+
+## Upgrading modpack version
+To upgrade the version of the FTB modpack running, simply update the `ftb_modpack_version` and apply your new changes.
+If the server is running when you do this, you will have to shut it down fully, using the `Stop Server` button in the UI.  Once the server is stopped and your terraform change has been applied, you can start the server again, and it will be upgraded.
 
 ## Troubleshooting
 You can ssh into your instance using your username and ssh key provided in the module config.  Depending on how far through it's start it got, you might be able to ssh to the instance using `minecraft.<your_domain>`.  If that doesn't work, you will have to get the instance's public ip address from the aws console or CLI.
@@ -104,8 +108,4 @@ Additionally you can look at the cloudwatch logs for the lambdas running for pot
   - modpack version info
   - allow upgrade of modpack (text field to input modpack url, button to set the `REMOVE_OLD_MODS="TRUE"` flag?)
 - Add back in option to use api password instead of Auth0
-- Backup system upgrades
-    - Periodic backups (not just at shutdown time)
-    - Faster shutdown
 - Add support for vanilla minecraft
-- Ensure minecraft exits when given the command to

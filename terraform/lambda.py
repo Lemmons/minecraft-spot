@@ -100,6 +100,13 @@ RUNNING_STATES = ['InService']
 STARTING_STATES = ['Pending', 'Pending:Wait', 'Pending:Proceed']
 STOPPING_STATES = ['Terminating', 'Terminating:Proceed']
 def status(event, context):
+    # last backup time and size
+    # server status (up, starting up, down, shutting down)
+    # current uptime (if up)
+    # approx current cost (if up)
+    # player count (if up)
+    # total uptime (past month, past week, past day)
+    # approx total cost (past month, past week, past day)
     try:
         method_base(event, 'status')
     except Unauthorized:
