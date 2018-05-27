@@ -13,7 +13,7 @@ The easiest way to get going is to add this as a terraform module in your aws te
 Below is an example of what this might look like:
 ```
 module "minecraft-spot" {
-  source = "github.com/Lemmons/minecraft-spot//terraform?ref=1.0"
+  source = "github.com/Lemmons/minecraft-spot//terraform?ref=1.1"
 
   username = "<your desired login username>"
   pub_ssh_key = "<your public ssh key for logging in>"
