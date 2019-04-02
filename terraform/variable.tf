@@ -62,7 +62,7 @@ variable "ftb_backups_path" {
   default = "FeedTheBeast/backups"
 }
 
-variable "ftb_backup_index_path"
+variable "ftb_backup_index_path" {
   description = "the path where the server will save the backup index relative to the minecraft data path"
   default = "FeedTheBeast/backups/backups.json"
 }
