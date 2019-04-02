@@ -19,7 +19,7 @@ spot_tools.logger.setup_logging()
 LOGGER = logging.getLogger(__name__)
 
 MINECRAFT_DATA = '/data'
-BACKUP_INDEX_PATH = os.environ.get('BACKUP_INDEX_PATH', 'FeedTheBeast/backups/backups.json')
+BACKUP_INDEX_PATH = os.path.join(MINECRAFT_DATA, os.environ.get('BACKUP_INDEX_PATH', 'FeedTheBeast/backups/backups.json'))
 BACKUP_COMMAND = os.environ.get('BACKUP_COMMAND', 'rcon-cli ftb backup start')
 BACKUPS_PATH = os.path.join(MINECRAFT_DATA, os.environ.get('BACKUPS_PATH', 'FeedTheBeast/backups'))
 SAVE_RESTORE_PATH = os.path.join(MINECRAFT_DATA, 'FeedTheBeast')
