@@ -66,6 +66,9 @@ data "template_file" "minecraft" {
                 AWS_DEFAULT_REGION: ${var.aws_region}
                 S3_BUCKET: ${var.bucket_name}
                 LIFECYCLE_HOOK_NAME: "${var.name_prefix}minecraft-terminate"
+                BACKUP_COMMAND: "${var.ftb_backup_command}"
+                BACKUP_INDEX_PATH: ${var.ftb_backup_index_path}
+                BACKUPS_PATH: ${var.ftb_backups_path}
             check_players:
               container_name: check_players
               image: ${var.tools_docker_image_id}

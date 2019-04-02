@@ -52,6 +52,21 @@ variable "ftb_modpack_version" {
   description = "the ftb modpack version to use, like: https://www.feed-the-beast.com/projects/ftb-presents-direwolf20-1-12/files/2541246"
 }
 
+variable "ftb_backup_command" {
+  description = "the command to use to cause the server to backup"
+  default = "rcon-cli ftb backup start"
+}
+
+variable "ftb_backups_path" {
+  description = "the path where the server will backup relative to the minecraft data path"
+  default = "FeedTheBeast/backups"
+}
+
+variable "ftb_backup_index_path"
+  description = "the path where the server will save the backup index relative to the minecraft data path"
+  default = "FeedTheBeast/backups/backups.json"
+}
+
 variable "instance_type" {
   description = "the aws instance type to use for the service"
   default = "m5.large"

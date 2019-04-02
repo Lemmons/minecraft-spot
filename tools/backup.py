@@ -19,7 +19,9 @@ spot_tools.logger.setup_logging()
 LOGGER = logging.getLogger(__name__)
 
 MINECRAFT_DATA = '/data'
-BACKUPS_PATH = os.path.join(MINECRAFT_DATA, 'FeedTheBeast/backups')
+BACKUP_INDEX_PATH = os.environ.get('BACKUP_INDEX_PATH', 'FeedTheBeast/backups/backups.json')
+BACKUP_COMMAND = os.environ.get('BACKUP_COMMAND', 'rcon-cli ftb backup start')
+BACKUPS_PATH = os.path.join(MINECRAFT_DATA, os.environ.get('BACKUPS_PATH', 'FeedTheBeast/backups'))
 SAVE_RESTORE_PATH = os.path.join(MINECRAFT_DATA, 'FeedTheBeast')
 BACKUP_S3_KEY = 'backups/latest.zip'
 LEGACY_BACKUP_S3_KEY = 'backups/latest.tgz'
@@ -28,7 +30,7 @@ OTHERS_BACKUP_S3_KEY = 'backups/others.tgz'
 S3_BUCKET = os.environ.get('S3_BUCKET')
 
 def get_latest_local_backup():
-    backups_index = os.path.join(BACKUPS_PATH, 'backups.json')
+    backups_index = BACKUP_INDEX_PATH
 
     backups = {backup['time']: backup for backup in json.load(open(backups_index)) if backup['success']==True}
     return backups[max(backups.keys())]
@@ -74,7 +76,7 @@ def local_backup():
 
     LOGGER.info('backing-up minecraft locally')
     last_backup_time = get_latest_local_backup_time()
-    minecraft.exec_run('rcon-cli ftb backup start')
+    minecraft.exec_run(BACKUP_COMMAND)
     count = 0
     while get_latest_local_backup_time() <= last_backup_time:
         time.sleep(1)
