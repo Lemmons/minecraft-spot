@@ -54,7 +54,7 @@ resource "aws_lambda_function" "authorizer" {
   function_name    = "${var.name_prefix}jwtRsaCustomAuthorizer"
   role             = "${aws_iam_role.authorizer-lambda.arn}"
   handler          = "index.handler"
-  runtime          = "nodejs4.3"
+  runtime          = "nodejs8.10"
   source_code_hash = "${base64sha256(file("${path.module}/custom_authorizer/custom-authorizer.zip"))}"
   environment {
     variables = {
