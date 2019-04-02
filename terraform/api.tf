@@ -56,7 +56,7 @@ data "archive_file" "lambda" {
 
 resource "aws_lambda_function" "start" {
   filename         = "${data.archive_file.lambda.output_path}"
-  function_name    = "start_minecraft"
+  function_name    = "${var.name_prefix}start_minecraft"
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "lambda.start"
   runtime          = "python3.6"
@@ -115,7 +115,7 @@ resource "aws_lambda_permission" "stop" {
 
 resource "aws_lambda_function" "stop" {
   filename         = "${data.archive_file.lambda.output_path}"
-  function_name    = "stop_minecraft"
+  function_name    = "${var.name_prefix}stop_minecraft"
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "lambda.stop"
   runtime          = "python3.6"
@@ -174,7 +174,7 @@ resource "aws_lambda_permission" "status" {
 
 resource "aws_lambda_function" "status" {
   filename         = "${data.archive_file.lambda.output_path}"
-  function_name    = "status_minecraft"
+  function_name    = "${var.name_prefix}status_minecraft"
   role             = "${aws_iam_role.lambda.arn}"
   handler          = "lambda.status"
   runtime          = "python3.6"
