@@ -22,7 +22,7 @@ resource "aws_launch_configuration" "minecraft" {
   iam_instance_profile = "${aws_iam_instance_profile.minecraft.name}"
   security_groups = ["${aws_security_group.minecraft.id}"]
 
-  user_data = "${data.template_cloudinit_config.config.rendered}"
+  user_data = "${var.game_rendered_cloudconfig}"
 
   lifecycle {
     create_before_destroy = true
