@@ -16,20 +16,6 @@ LOGGER = logging.getLogger(__name__)
 
 GRACE_PERIOD = int(os.environ['GRACE_PERIOD'])
 
-def mark_instance_for_removal():
-    LOGGER.info('Marking intance for removal')
-
-    client = spot_tools.aws.get_boto_client('autoscaling')
-
-    instance_id = requests.get('http://169.254.169.254/latest/meta-data/instance-id').text
-    instance_details = client.describe_auto_scaling_instances(InstanceIds=[instance_id])['AutoScalingInstances'][0]
-
-    client.set_desired_capacity(
-        AutoScalingGroupName=instance_details['AutoScalingGroupName'],
-        DesiredCapacity=0,
-        HonorCooldown=False,
-    )
-
 PLAYERS_RE = re.compile(r'There are (?P<players>\d*)/\d* players online:')
 def get_players():
     minecraft = spot_tools.minecraft.get_minecraft()
@@ -62,7 +48,7 @@ def main():
         LOGGER.info('{:.0f} seconds since last player seen'.format(seconds_since_player_last_seen))
 
         if seconds_since_player_last_seen >= GRACE_PERIOD:
-            mark_instance_for_removal()
+            spot_tools.aws.mark_instance_for_removal()
             break
 
 if __name__ == "__main__":
