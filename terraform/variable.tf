@@ -1,6 +1,6 @@
 variable "name_prefix" {
   description = "A prefix to add to resource names to ensure uniqueness and easy searchabilty"
-  default = ""
+  default     = ""
 }
 
 variable "username" {
@@ -17,17 +17,17 @@ variable "hosted_zone_id" {
 
 variable "api_subdomain" {
   description = "the subdomain name to run the api at"
-  default = "api"
+  default     = "api"
 }
 
 variable "minecraft_subdomain" {
   description = "the subdomain name to run the minecraft instance at"
-  default = "minecraft"
+  default     = "minecraft"
 }
 
 variable "webapp_subdomain" {
   description = "the subdomain name to run the web application at"
-  default = "app"
+  default     = "app"
 }
 
 variable "domain_ssl_certificate_arn" {
@@ -36,12 +36,12 @@ variable "domain_ssl_certificate_arn" {
 
 variable "tools_docker_image_id" {
   description = "the docker image with the tools for checking and changing status of the server"
-  default = "tlemmon/minecraft-spot-tools:0.8"
+  default     = "tlemmon/minecraft-spot-tools:0.8"
 }
 
 variable "minecraft_docker_image_id" {
   description = "the minecraft-server docker image to use"
-  default = "tlemmon/minecraft-server:0.1"
+  default     = "tlemmon/minecraft-server:0.1"
 }
 
 variable "aws_region" {
@@ -54,31 +54,31 @@ variable "ftb_modpack_version" {
 
 variable "ftb_backup_command" {
   description = "the command to use to cause the server to backup"
-  default = "rcon-cli ftb backup start"
+  default     = "rcon-cli ftb backup start"
 }
 
 variable "ftb_backups_path" {
   description = "the path where the server will backup relative to the minecraft data path"
-  default = "FeedTheBeast/backups"
+  default     = "FeedTheBeast/backups"
 }
 
 variable "ftb_backup_index_path" {
   description = "the path where the server will save the backup index relative to the minecraft data path"
-  default = "FeedTheBeast/backups/backups.json"
+  default     = "FeedTheBeast/backups/backups.json"
 }
 
 variable "instance_type" {
   description = "the aws instance type to use for the service"
-  default = "m5.large"
+  default     = "m5.large"
 }
 
 variable "spot_price" {
   description = "the price to bid for the instance, in $/hour. If the price goes higher than this, you service will be automatically terminated. For an m5.large, 0.04 seems to work well"
-  default = "0.04"
+  default     = "0.04"
 }
 
 variable "public_subnets" {
-  type = "list"
+  type        = list(string)
   description = "a list of public subnets, which will be used to spawn the infrastructure for the service"
 }
 
@@ -92,7 +92,7 @@ variable "bucket_name" {
 
 variable "no_user_grace_period" {
   description = "the amount of time (in seconds) no user can be present on the server before it terminates itself"
-  default = "1800"
+  default     = "1800"
 }
 
 variable "auth_token_issuer" {
@@ -109,17 +109,18 @@ variable "auth_audience" {
 
 variable "extra_origins" {
   description = "Extra origins to add for cors support. Useful for debugging locally, but shouldn't be needed in production"
-  type = "list"
-  default = []
+  type        = list(string)
+  default     = []
 }
 
 variable "cloudfront_location_whitelist" {
   description = "The cloudfront locations to distribute the webapp to"
-  type = "list"
-  default = ["US", "CA", "GB", "DE"]
+  type        = list(string)
+  default     = ["US", "CA", "GB", "DE"]
 }
 
 variable "cloudfront_price_class" {
   description = "The cloudfront price class to us when distributing the webapp"
-  default = "PriceClass_100"
+  default     = "PriceClass_100"
 }
+
