@@ -1,12 +1,12 @@
 resource "aws_api_gateway_authorizer" "authorizer" {
-  name = "${var.name_prefix}authorizer"
-  rest_api_id   = "${aws_api_gateway_rest_api.api.id}"
-  authorizer_uri = "${aws_lambda_function.authorizer.invoke_arn}"
-  authorizer_credentials = "${aws_iam_role.authorizer.arn}"
+  name                   = "${var.name_prefix}authorizer"
+  rest_api_id            = aws_api_gateway_rest_api.api.id
+  authorizer_uri         = aws_lambda_function.authorizer.invoke_arn
+  authorizer_credentials = aws_iam_role.authorizer.arn
 
   identity_validation_expression = "^Bearer [-0-9a-zA-z\\.]*$"
-  type = "TOKEN"
-  identity_source = "method.request.header.Authorization"
+  type                           = "TOKEN"
+  identity_source                = "method.request.header.Authorization"
 }
 
 resource "aws_iam_role" "authorizer" {
@@ -26,12 +26,13 @@ resource "aws_iam_role" "authorizer" {
         }
       ]
     }
-    EOF
+EOF
+
 }
 
 resource "aws_iam_role_policy" "authorizer" {
   name = "${var.name_prefix}authorizer"
-  role = "${aws_iam_role.authorizer.id}"
+  role = aws_iam_role.authorizer.id
 
   policy = <<-EOF
     {
@@ -46,21 +47,22 @@ resource "aws_iam_role_policy" "authorizer" {
         }
       ]
     }
-    EOF
+EOF
+
 }
 
 resource "aws_lambda_function" "authorizer" {
   filename         = "${path.module}/custom_authorizer/custom-authorizer.zip"
   function_name    = "${var.name_prefix}jwtRsaCustomAuthorizer"
-  role             = "${aws_iam_role.authorizer-lambda.arn}"
+  role             = aws_iam_role.authorizer-lambda.arn
   handler          = "index.handler"
   runtime          = "nodejs8.10"
-  source_code_hash = "${base64sha256(file("${path.module}/custom_authorizer/custom-authorizer.zip"))}"
+  source_code_hash = filebase64sha256("${path.module}/custom_authorizer/custom-authorizer.zip")
   environment {
     variables = {
-      TOKEN_ISSUER = "${var.auth_token_issuer}"
-      JWKS_URI = "${var.auth_jwks_uri}"
-      AUDIENCE = "${var.auth_audience}"
+      TOKEN_ISSUER = var.auth_token_issuer
+      JWKS_URI     = var.auth_jwks_uri
+      AUDIENCE     = var.auth_audience
     }
   }
 }
@@ -82,12 +84,13 @@ resource "aws_iam_role" "authorizer-lambda" {
         }
       ]
     }
-    EOF
+EOF
+
 }
 
 resource "aws_iam_role_policy" "authorizer-lambda" {
   name = "${var.name_prefix}authorizer-lambda"
-  role = "${aws_iam_role.authorizer-lambda.id}"
+  role = aws_iam_role.authorizer-lambda.id
 
   policy = <<-EOF
     {
@@ -104,5 +107,7 @@ resource "aws_iam_role_policy" "authorizer-lambda" {
         }
       ]
     }
-    EOF
+EOF
+
 }
+

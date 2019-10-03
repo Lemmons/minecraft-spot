@@ -1,23 +1,23 @@
 data "template_cloudinit_config" "config" {
-  gzip = true
+  gzip          = true
   base64_encode = true
 
   part {
     content_type = "text/cloud-config"
-    content = "${data.template_file.users.rendered}"
-    merge_type = "list(append)+dict(recurse_array)+str()"
+    content      = data.template_file.users.rendered
+    merge_type   = "list(append)+dict(recurse_array)+str()"
   }
 
   part {
     content_type = "text/cloud-config"
-    content = "${data.template_file.docker.rendered}"
-    merge_type = "list(append)+dict(recurse_array)+str()"
+    content      = data.template_file.docker.rendered
+    merge_type   = "list(append)+dict(recurse_array)+str()"
   }
 
   part {
     content_type = "text/cloud-config"
-    content = "${data.template_file.minecraft.rendered}"
-    merge_type = "list(append)+dict(recurse_array)+str()"
+    content      = data.template_file.minecraft.rendered
+    merge_type   = "list(append)+dict(recurse_array)+str()"
   }
 }
 
@@ -79,7 +79,8 @@ data "template_file" "minecraft" {
               environment:
                 AWS_DEFAULT_REGION: ${var.aws_region}
                 GRACE_PERIOD: "${var.no_user_grace_period}"
-    EOF
+EOF
+
 }
 
 data "template_file" "users" {
@@ -95,7 +96,8 @@ data "template_file" "users" {
         ssh-import-id: None
         ssh-authorized_keys:
           - ${var.pub_ssh_key}
-    EOF
+EOF
+
 }
 
 data "template_file" "docker" {
@@ -112,5 +114,7 @@ data "template_file" "docker" {
       - apt-get install -y docker-ce
       - curl -L https://github.com/docker/compose/releases/download/1.17.0/docker-compose-linux-x86_64 > /usr/bin/docker-compose
       - chmod +x /usr/bin/docker-compose
-    EOF
+EOF
+
 }
+
