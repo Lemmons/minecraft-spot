@@ -11,7 +11,7 @@ import spot_tools.logger
 
 # dynamic import based on running game, currently supports minecraft or factorio
 GAME = os.environ['GAME']
-game_backup = importlib.import_module(f'{GAME}.backup')
+game_backup = importlib.import_module(f'spot_tools.{GAME}.backup')
 
 spot_tools.logger.setup_logging()
 LOGGER = logging.getLogger(__name__)

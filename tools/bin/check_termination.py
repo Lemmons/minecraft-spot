@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 
 # dynamic import based on running game, currently supports minecraft or factorio
 GAME = os.environ['GAME']
-game_instance = importlib.import_module(f'{GAME}.instance')
+game_instance = importlib.import_module(f'spot_tools.{GAME}.instance')
 
 
 def stop_and_backup():
