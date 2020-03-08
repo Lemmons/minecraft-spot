@@ -34,8 +34,8 @@ data "template_file" "minecraft" {
       - mkdir -p /srv/minecraft-spot/data
       - pip3 install awscli
       - aws configure set region ${var.aws_region}
-      - docker run --name set_route -e AWS_DEFAULT_REGION=${var.aws_region} -e FQDN=${var.minecraft_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")} -e ZONE_ID=${var.hosted_zone_id} ${var.tools_docker_image_id} set_route.py
-      - docker run --name restore_backup -e AWS_DEFAULT_REGION=${var.aws_region} -e S3_BUCKET=${var.bucket_name} -v /srv/minecraft-spot/data:/data ${var.tools_docker_image_id} restore_backup.py
+      - docker run --name set_route -e AWS_DEFAULT_REGION=${var.aws_region} -e FQDN=${var.subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")} -e ZONE_ID=${var.hosted_zone_id} ${var.tools_docker_image_id} set_route.py
+      - docker run --name restore_backup -e AWS_DEFAULT_REGION=${var.aws_region} -e S3_BUCKET=${var.bucket_name} -e GAME=minecraft -v /srv/minecraft-spot/data:/data ${var.tools_docker_image_id} restore_backup.py
       - chmod -R a+rwX /srv/minecraft-spot/data
       - docker-compose -f /srv/minecraft-spot/docker-compose.yaml up -d
     write_files:
@@ -47,7 +47,7 @@ data "template_file" "minecraft" {
           services:
             minecraft:
               container_name: minecraft
-              image: ${var.minecraft_docker_image_id}
+              image: ${var.docker_image}
               restart: on-failure
               ports:
                 - 25565:25565
@@ -70,9 +70,10 @@ data "template_file" "minecraft" {
                 AWS_DEFAULT_REGION: ${var.aws_region}
                 S3_BUCKET: ${var.bucket_name}
                 LIFECYCLE_HOOK_NAME: "${var.name_prefix}minecraft-terminate"
-                BACKUP_COMMAND: "${var.ftb_backup_command}"
-                BACKUP_INDEX_PATH: ${var.ftb_backup_index_path}
-                BACKUPS_PATH: ${var.ftb_backups_path}
+                BACKUP_COMMAND: "${var.backup_command}"
+                BACKUP_INDEX_PATH: ${var.backup_index_path}
+                BACKUPS_PATH: ${var.backups_path}
+                GAME: "minecraft"
             check_players:
               container_name: check_players
               image: ${var.tools_docker_image_id}
@@ -83,6 +84,7 @@ data "template_file" "minecraft" {
               environment:
                 AWS_DEFAULT_REGION: ${var.aws_region}
                 GRACE_PERIOD: "${var.no_user_grace_period}"
+                GAME: "minecraft"
 EOF
 
 }

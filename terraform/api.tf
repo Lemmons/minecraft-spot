@@ -331,4 +331,3 @@ resource "aws_api_gateway_deployment" "api" {
     create_before_destroy = true
   }
 }
-

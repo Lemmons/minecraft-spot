@@ -78,5 +78,9 @@ variable "cloudfront_price_class" {
 }
 
 variable "game_rendered_cloudconfig" {
-  description = "The rendered cloudconfig for the gameserver"
+  description = "The rendered cloudconfig for the game server"
+}
+
+variable "game_port" {
+  description = "The port the game server is running on"
 }
