@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
+import importlib
 import logging
 import os
 import time
 import re
-import importlib
 
 import spot_tools.aws
 import spot_tools.logger
