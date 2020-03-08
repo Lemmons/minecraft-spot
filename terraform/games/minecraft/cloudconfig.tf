@@ -1,5 +1,5 @@
 data "aws_route53_zone" "zone" {
-  zone_id = "${var.hosted_zone_id}"
+  zone_id = var.hosted_zone_id
 }
 
 data "template_cloudinit_config" "config" {

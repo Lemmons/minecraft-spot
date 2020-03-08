@@ -4,7 +4,7 @@ variable "aws_region" {
 
 variable "name_prefix" {
   description = "A prefix to add to resource names to ensure uniqueness and easy searchabilty"
-  default = ""
+  default     = ""
 }
 
 variable "username" {
@@ -21,12 +21,12 @@ variable "hosted_zone_id" {
 
 variable "tools_docker_image_id" {
   description = "the docker image with the tools for checking and changing status of the server"
-  default = "tlemmon/minecraft-spot-tools:0.8"
+  default     = "tlemmon/minecraft-spot-tools:0.8"
 }
 
 variable "minecraft_docker_image_id" {
   description = "the minecraft-server docker image to use"
-  default = "tlemmon/minecraft-server:0.1"
+  default     = "tlemmon/minecraft-server:0.1"
 }
 
 variable "bucket_name" {
@@ -35,12 +35,12 @@ variable "bucket_name" {
 
 variable "minecraft_subdomain" {
   description = "the subdomain name to run the minecraft instance at"
-  default = "minecraft"
+  default     = "minecraft"
 }
 
 variable "no_user_grace_period" {
   description = "the amount of time (in seconds) no user can be present on the server before it terminates itself"
-  default = "1800"
+  default     = "1800"
 }
 
 variable "ftb_modpack_version" {
@@ -49,15 +49,15 @@ variable "ftb_modpack_version" {
 
 variable "ftb_backup_command" {
   description = "the command to use to cause the server to backup"
-  default = "rcon-cli ftb backup start"
+  default     = "rcon-cli ftb backup start"
 }
 
 variable "ftb_backups_path" {
   description = "the path where the server will backup relative to the minecraft data path"
-  default = "FeedTheBeast/backups"
+  default     = "FeedTheBeast/backups"
 }
 
 variable "ftb_backup_index_path" {
   description = "the path where the server will save the backup index relative to the minecraft data path"
-  default = "FeedTheBeast/backups/backups.json"
+  default     = "FeedTheBeast/backups/backups.json"
 }
