@@ -15,14 +15,14 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_launch_configuration" "minecraft" {
-  image_id      = "${data.aws_ami.ubuntu.id}"
-  instance_type = "${var.instance_type}"
-  spot_price    = "${var.spot_price}"
+  image_id      = data.aws_ami.ubuntu.id
+  instance_type = var.instance_type
+  spot_price    = var.spot_price
 
-  iam_instance_profile = "${aws_iam_instance_profile.minecraft.name}"
-  security_groups = ["${aws_security_group.minecraft.id}"]
+  iam_instance_profile = aws_iam_instance_profile.minecraft.name
+  security_groups      = [aws_security_group.minecraft.id]
 
-  user_data = "${var.game_rendered_cloudconfig}"
+  user_data = var.game_rendered_cloudconfig
 
   lifecycle {
     create_before_destroy = true
@@ -30,37 +30,37 @@ resource "aws_launch_configuration" "minecraft" {
 }
 
 resource "aws_autoscaling_group" "minecraft" {
-  name                 = "${var.name_prefix}minecraft"
+  name     = "${var.name_prefix}minecraft"
   min_size = 0
   max_size = 1
 
   health_check_grace_period = 300
   health_check_type         = "EC2"
 
-  vpc_zone_identifier = ["${var.public_subnets}"]
+  vpc_zone_identifier = var.public_subnets
 
   tags = [
     {
       key                 = "Name"
       value               = "${var.name_prefix}minecraft"
       propagate_at_launch = true
-    }
+    },
   ]
 
-  launch_configuration = "${aws_launch_configuration.minecraft.name}"
+  launch_configuration = aws_launch_configuration.minecraft.name
 }
 
 resource "aws_autoscaling_lifecycle_hook" "minecraft-terminate" {
   name                   = "${var.name_prefix}minecraft-terminate"
-  autoscaling_group_name = "${aws_autoscaling_group.minecraft.name}"
+  autoscaling_group_name = aws_autoscaling_group.minecraft.name
   default_result         = "CONTINUE"
   heartbeat_timeout      = 300
   lifecycle_transition   = "autoscaling:EC2_INSTANCE_TERMINATING"
 }
 
 resource "aws_iam_instance_profile" "minecraft" {
-  name  = "${var.name_prefix}minecraft"
-  role = "${aws_iam_role.minecraft.name}"
+  name = "${var.name_prefix}minecraft"
+  role = aws_iam_role.minecraft.name
 }
 
 resource "aws_iam_role" "minecraft" {
@@ -81,12 +81,13 @@ resource "aws_iam_role" "minecraft" {
         }
       ]
     }
-    EOF
+EOF
+
 }
 
 resource "aws_iam_role_policy" "minecraft" {
   name = "${var.name_prefix}minecraft"
-  role = "${aws_iam_role.minecraft.id}"
+  role = aws_iam_role.minecraft.id
 
   policy = <<-EOF
     {
@@ -129,20 +130,22 @@ resource "aws_iam_role_policy" "minecraft" {
         }
       ]
     }
-    EOF
+EOF
+
 }
 
 resource "aws_s3_bucket" "minecraft" {
-  bucket = "${var.bucket_name}"
+  bucket = var.bucket_name
 
   versioning {
     enabled = true
   }
 
-  lifecycle_rule  {
+  lifecycle_rule {
     enabled = true
     noncurrent_version_expiration {
       days = 5
     }
   }
 }
+
