@@ -9,24 +9,24 @@ import time
 import zipfile
 
 import spot_tools.aws
+import spot_tools.backup
 import spot_tools.errors
-import spot_tools.logger
 import spot_tools.instance
+import spot_tools.logger
 
 spot_tools.logger.setup_logging()
 LOGGER = logging.getLogger(__name__)
 
 GAME_DATA = '/data'
-BACKUP_INDEX_PATH = os.path.join(GAME_DATA, os.environ['BACKUP_INDEX_PATH'])
-BACKUP_COMMAND = os.environ['BACKUP_COMMAND']
+BACKUP_INDEX_PATH = os.path.join(GAME_DATA, os.environ.get('BACKUP_INDEX_PATH', 'FeedTheBeast/backups/backups.json'))
+BACKUP_COMMAND = os.environ.get('BACKUP_COMMAND', 'rcon-cli ftb backup start')
 SAVE_RESTORE_PATH = os.path.join(GAME_DATA, 'FeedTheBeast')
 
-S3_BUCKET = os.environ['S3_BUCKET']
+S3_BUCKET = os.environ.get('S3_BUCKET')
 BACKUP_S3_KEY = 'backups/latest.zip'
 LEGACY_BACKUP_S3_KEY = 'backups/latest.tgz'
 PREVIOUS_BACKUP_S3_KEY = 'backups/previous.zip'
 OTHERS_BACKUP_S3_KEY = 'backups/others.tgz'
-
 
 
 def get_latest_local_backup():
@@ -45,14 +45,14 @@ def get_latest_local_backup_time():
         return 0
 
 def get_legacy_s3_backup_time():
-    return get_backup_time('legacy', LEGACY_BACKUP_S3_KEY)
+    return spot_tools.backup.get_backup_time('legacy', LEGACY_BACKUP_S3_KEY)
 
 def get_others_s3_backup_time():
-    return get_backup_time('others', OTHERS_BACKUP_S3_KEY)
+    return spot_tools.backup.get_backup_time('others', OTHERS_BACKUP_S3_KEY)
 
 def local_backup():
     instance = spot_tools.instance.get_instance()
-    if instance.status == "exited" or spot_tools.instance.instance.get_instance_health() != "healthy":
+    if instance.status == "exited" or spot_tools.instance.get_instance_health() != "healthy":
         raise spot_tools.errors.UnableToBackupError("cannot backup, minecraft not running")
 
     LOGGER.info('backing-up minecraft locally')
@@ -96,7 +96,7 @@ def restore_backup():
     except:
         pass
 
-    if get_legacy_s3_backup_time() and not get_latest_s3_backup_time():
+    if get_legacy_s3_backup_time() and not spot_tools.backup.get_latest_s3_backup_time():
         LOGGER.info('Restoring legacy backup from {}'.format(LEGACY_BACKUP_S3_KEY))
         filename = '/tmp/latest.tgz'
         LOGGER.info('Downloading {} to {}'.format(LEGACY_BACKUP_S3_KEY, filename))
@@ -115,7 +115,7 @@ def restore_backup():
             LOGGER.info('Un-taring {} to {}'.format(filename, GAME_DATA))
             tar.extractall(GAME_DATA + '/..')
 
-    if get_latest_s3_backup_time():
+    if spot_tools.backup.get_latest_s3_backup_time():
         LOGGER.info('Restoring backup from {}'.format(BACKUP_S3_KEY))
         filename = '/tmp/latest.zip'
         LOGGER.info('Downloading {} to {}'.format(BACKUP_S3_KEY, filename))

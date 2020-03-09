@@ -26,7 +26,7 @@ variable "tools_docker_image_id" {
 
 variable "docker_image" {
   description = "the minecraft-server docker image to use"
-  default     = "tlemmon/minecraft-server:0.1"
+  default     = "itzg/minecraft-server:20200129"
 }
 
 variable "bucket_name" {
@@ -43,8 +43,13 @@ variable "no_user_grace_period" {
   default     = "1800"
 }
 
-variable "ftb_modpack_version" {
-  description = "the ftb modpack version to use, like: https://www.feed-the-beast.com/projects/ftb-presents-direwolf20-1-12/files/2541246"
+variable "modpack_type" {
+  description = "Currently supports CURSEFORGE or FTB"
+  default     = "CURSEFORGE"
+}
+
+variable "modpack_version" {
+  description = "the ftb modpack version to use, like: https://www.curseforge.com/minecraft/modpacks/ftb-presents-direwolf20-1-12/download/2690320"
 }
 
 variable "backup_command" {

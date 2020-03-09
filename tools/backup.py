@@ -17,8 +17,8 @@ spot_tools.logger.setup_logging()
 LOGGER = logging.getLogger(__name__)
 
 GAME_DATA = '/data'
-BACKUPS_PATH = os.path.join(GAME_DATA, os.environ['BACKUPS_PATH'])
-S3_BUCKET = os.environ['S3_BUCKET']
+BACKUPS_PATH = os.path.join(GAME_DATA, os.environ.get('BACKUPS_PATH'))
+S3_BUCKET = os.environ.get('S3_BUCKET')
 BACKUP_S3_KEY = 'backups/latest.zip'
 
 
