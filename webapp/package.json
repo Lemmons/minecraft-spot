@@ -16,7 +16,7 @@
     "@babel/preset-env": "^7.0.0-beta.44",
     "@babel/preset-react": "^7.0.0-beta.44",
     "@material-ui/icons": "^1.0.0-beta.42",
-    "auth0-js": "^9.4.2",
+    "auth0-js": "^9.13.2",
     "axios": "^0.18.1",
     "babel-loader": "^8.0.0-beta",
     "babel-plugin-transform-class-properties": "^6.24.1",
