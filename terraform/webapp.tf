@@ -123,4 +123,3 @@ resource "aws_route53_record" "webapp" {
 output "webapp-distribution-id" {
   value = aws_cloudfront_distribution.webapp.id
 }
-

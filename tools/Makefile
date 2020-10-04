@@ -1,11 +1,11 @@
 TAG?=dev
 
 build:
-	docker build . -t tlemmon/minecraft-spot-tools:$(TAG)
+	docker build . -t tlemmon/spot-tools:$(TAG)
 
 push: build
-	docker push tlemmon/minecraft-spot-tools:$(TAG)
+	docker push tlemmon/spot-tools:$(TAG)
 
 push-latest: push
-	docker tag tlemmon/minecraft-spot-tools:$(TAG) tlemmon/minecraft-spot-tools:latest
-	docker push tlemmon/minecraft-spot-tools:latest
+	docker tag tlemmon/spot-tools:$(TAG) tlemmon/spot-tools:latest
+	docker push tlemmon/spot-tools:latest
