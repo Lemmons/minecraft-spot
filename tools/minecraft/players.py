@@ -11,7 +11,7 @@ import spot_tools.instance
 spot_tools.logger.setup_logging()
 LOGGER = logging.getLogger(__name__)
 
-PLAYERS_RE = re.compile(r'There are (?P<players>\d*)/\d* players online:')
+PLAYERS_RE = re.compile(r'There are (?P<players>\d*)(/\d*| .*) players online:')
 def get_players():
     instance = spot_tools.instance.get_instance()
     if instance.status == "exited":
