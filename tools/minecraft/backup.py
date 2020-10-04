@@ -18,8 +18,8 @@ spot_tools.logger.setup_logging()
 LOGGER = logging.getLogger(__name__)
 
 GAME_DATA = '/data'
-BACKUP_INDEX_PATH = os.path.join(GAME_DATA, os.environ.get('BACKUP_INDEX_PATH', 'FeedTheBeast/backups/backups.json'))
-BACKUP_COMMAND = os.environ.get('BACKUP_COMMAND', 'rcon-cli ftb backup start')
+BACKUP_INDEX_PATH = os.path.join(GAME_DATA, os.environ.get('BACKUP_INDEX_PATH', 'FeedTheBeast/local/ftbutilities/backups.json'))
+BACKUP_COMMAND = os.environ.get('BACKUP_COMMAND', 'rcon-cli backup start')
 SAVE_RESTORE_PATH = os.path.join(GAME_DATA, 'FeedTheBeast')
 
 S3_BUCKET = os.environ.get('S3_BUCKET')

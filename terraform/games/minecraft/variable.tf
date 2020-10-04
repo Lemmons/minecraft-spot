@@ -64,5 +64,5 @@ variable "backups_path" {
 
 variable "backup_index_path" {
   description = "the path where the server will save the backup index relative to the minecraft data path"
-  default     = "FeedTheBeast/backups/backups.json"
+  default     = "FeedTheBeast/local/ftbutilities/backups.json"
 }
