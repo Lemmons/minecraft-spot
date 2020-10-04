@@ -23,7 +23,7 @@ data "aws_iam_policy_document" "webapp" {
 
 resource "aws_cloudfront_distribution" "webapp" {
   origin {
-    domain_name = aws_s3_bucket.webapp.bucket_domain_name
+    domain_name = aws_s3_bucket.webapp.bucket_regional_domain_name
     origin_id   = "${var.name_prefix}minecraft-spot-origin"
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.webapp.cloudfront_access_identity_path
