@@ -25,6 +25,10 @@ data "template_cloudinit_config" "config" {
   }
 }
 
+locals {
+  game = "minecraft"
+}
+
 data "template_file" "minecraft" {
   template = <<-EOF
     #cloud-config
@@ -34,8 +38,8 @@ data "template_file" "minecraft" {
       - mkdir -p /srv/minecraft-spot/data
       - pip3 install awscli
       - aws configure set region ${var.aws_region}
-      - docker run --name set_route -e AWS_DEFAULT_REGION=${var.aws_region} -e FQDN=${var.subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")} -e ZONE_ID=${var.hosted_zone_id} -e GAME=minecraft -e BACKUPS_PATH=${var.backups_path} ${var.tools_docker_image_id} set_route.py
-      - docker run --name restore_backup -e AWS_DEFAULT_REGION=${var.aws_region} -e S3_BUCKET=${var.bucket_name} -e GAME=minecraft -e BACKUPS_PATH=${var.backups_path} -v /srv/minecraft-spot/data:/data ${var.tools_docker_image_id} restore_backup.py
+      - docker run --name set_route -e AWS_DEFAULT_REGION=${var.aws_region} -e FQDN=${var.subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")} -e ZONE_ID=${var.hosted_zone_id} -e GAME=${local.game} -e BACKUPS_PATH=${var.backups_path} ${var.tools_docker_image_id} set_route.py
+      - docker run --name restore_backup -e AWS_DEFAULT_REGION=${var.aws_region} -e S3_BUCKET=${var.bucket_name} -e GAME=${local.game} -e BACKUPS_PATH=${var.backups_path} -v /srv/minecraft-spot/data:/data ${var.tools_docker_image_id} restore_backup.py
       - chmod -R a+rwX /srv/minecraft-spot/data
       - docker-compose -f /srv/minecraft-spot/docker-compose.yaml up -d
     write_files:
@@ -46,7 +50,7 @@ data "template_file" "minecraft" {
           version: "3"
           services:
             minecraft:
-              container_name: minecraft
+              container_name: ${local.game}
               image: ${var.docker_image}
               restart: on-failure
               ports:
@@ -73,7 +77,7 @@ data "template_file" "minecraft" {
                 BACKUP_COMMAND: "${var.backup_command}"
                 BACKUP_INDEX_PATH: ${var.backup_index_path}
                 BACKUPS_PATH: ${var.backups_path}
-                GAME: "minecraft"
+                GAME: "${local.game}"
             check_players:
               container_name: check_players
               image: ${var.tools_docker_image_id}
@@ -89,7 +93,7 @@ data "template_file" "minecraft" {
                 BACKUP_INDEX_PATH: ${var.backup_index_path}
                 BACKUPS_PATH: ${var.backups_path}
                 GRACE_PERIOD: "${var.no_user_grace_period}"
-                GAME: "minecraft"
+                GAME: "${local.game}"
 EOF
 
 }

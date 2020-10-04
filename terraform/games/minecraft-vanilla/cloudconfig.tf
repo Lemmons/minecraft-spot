@@ -50,7 +50,7 @@ data "template_file" "minecraft" {
           version: "3"
           services:
             minecraft:
-              container_name: minecraft
+              container_name: ${local.game}
               image: ${var.docker_image}
               restart: on-failure
               ports:
