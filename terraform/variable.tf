@@ -17,10 +17,6 @@ variable "webapp_subdomain" {
   default     = "app"
 }
 
-variable "domain_ssl_certificate_arn" {
-  description = "the api domain's ssl cerficate arn. This MUST match the api name and be created in the us-east-1 (N. Virginia) zone"
-}
-
 variable "aws_region" {
   description = "the aws region the server is running in"
 }
@@ -35,13 +31,13 @@ variable "spot_price" {
   default     = "0.04"
 }
 
+variable "vpc_id" {
+  description = "the vpc this service will run in"
+}
+
 variable "public_subnets" {
   type        = list(string)
   description = "a list of public subnets, which will be used to spawn the infrastructure for the service"
-}
-
-variable "vpc_id" {
-  description = "the vpc this service will run in"
 }
 
 variable "bucket_name" {

@@ -8,6 +8,7 @@ It requires moderate experience with [terraform](https://www.terraform.io/intro/
 Currently only supports [FTB](https://www.feed-the-beast.com/) modded versions of minecraft.
 
 ## Usage
+WARNING: OUT OF DATE - NEEDS TO BE UPDATED FOR LATEST REFACTOR
 The easiest way to get going is to add this as a terraform module in your aws terraform infrastructure.
 
 Below is an example of what this might look like:
@@ -21,7 +22,6 @@ module "minecraft-spot" {
   hosted_zone_id = "<your route53 hosted zone>"
   api_subdomain= "api"
   minecraft_subdomain= "minecraft"
-  domain_ssl_certificate_arn = "<an ACM cert arn in us-east-1 for the api_subdomain FQDN>"
 
   aws_region = "us-west-2"
 
