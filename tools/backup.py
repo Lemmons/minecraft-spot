@@ -65,3 +65,6 @@ def backup_if_needed():
 
 def restore_backup():
     game_backup.restore_backup()
+
+def others_backup_if_needed():
+    game_backup.others_backup_if_needed()
