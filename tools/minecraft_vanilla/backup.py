@@ -36,7 +36,7 @@ def local_backup():
     LOGGER.info('backing-up minecraft locally')
 
     instance.exec_run('rcon-cli save-off')
-    instance.exec_run('rcon-cli save-all')
+    instance.exec_run('rcon-cli save-all flush')
 
     # create path if it doesn't exist
     os.makedirs(BACKUPS_PATH, exist_ok=True)
