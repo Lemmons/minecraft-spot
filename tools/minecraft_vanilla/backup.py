@@ -38,6 +38,9 @@ def local_backup():
     instance.exec_run('rcon-cli save-off')
     instance.exec_run('rcon-cli save-all')
 
+    # create path if it doesn't exist
+    os.makedirs(BACKUPS_PATH, exist_ok=True)
+
     timestamp = int(time.time())
     path = os.path.join(BACKUPS_PATH, f'{timestamp}.zip')
     with zipfile.ZipFile(path, 'w') as backup:
