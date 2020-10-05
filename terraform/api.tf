@@ -291,7 +291,7 @@ data "aws_route53_zone" "zone" {
 
 resource "aws_api_gateway_domain_name" "api" {
   domain_name     = "${var.api_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}"
-  certificate_arn = var.domain_ssl_certificate_arn
+  certificate_arn = aws_acm_certificate.api.arn
 }
 
 resource "aws_route53_record" "api" {

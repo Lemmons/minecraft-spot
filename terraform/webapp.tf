@@ -23,7 +23,7 @@ data "aws_iam_policy_document" "webapp" {
 
 resource "aws_cloudfront_distribution" "webapp" {
   origin {
-    domain_name = aws_s3_bucket.webapp.bucket_domain_name
+    domain_name = aws_s3_bucket.webapp.bucket_regional_domain_name
     origin_id   = "${var.name_prefix}minecraft-spot-origin"
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.webapp.cloudfront_access_identity_path
@@ -79,33 +79,6 @@ resource "aws_cloudfront_distribution" "webapp" {
 
 resource "aws_cloudfront_origin_access_identity" "webapp" {
   comment = "${var.name_prefix}minecraft-spot-origin-access-identity"
-}
-
-provider "aws" {
-  alias  = "east"
-  region = "us-east-1"
-}
-
-resource "aws_acm_certificate" "webapp" {
-  provider = aws.east
-
-  domain_name       = "${var.webapp_subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}"
-  validation_method = "DNS"
-}
-
-resource "aws_route53_record" "webapp_cert_validation" {
-  name    = aws_acm_certificate.webapp.domain_validation_options[0].resource_record_name
-  type    = aws_acm_certificate.webapp.domain_validation_options[0].resource_record_type
-  zone_id = data.aws_route53_zone.zone.id
-  records = [aws_acm_certificate.webapp.domain_validation_options[0].resource_record_value]
-  ttl     = 60
-}
-
-resource "aws_acm_certificate_validation" "webapp" {
-  provider = aws.east
-
-  certificate_arn         = aws_acm_certificate.webapp.arn
-  validation_record_fqdns = [aws_route53_record.webapp_cert_validation.fqdn]
 }
 
 resource "aws_route53_record" "webapp" {

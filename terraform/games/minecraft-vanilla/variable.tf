@@ -43,26 +43,12 @@ variable "no_user_grace_period" {
   default     = "1800"
 }
 
-variable "modpack_type" {
-  description = "Currently supports CURSEFORGE or FTB"
-  default     = "CURSEFORGE"
-}
-
-variable "modpack_version" {
-  description = "the ftb modpack version to use, like: https://www.curseforge.com/minecraft/modpacks/ftb-presents-direwolf20-1-12/download/2690320"
-}
-
-variable "backup_command" {
-  description = "the command to use to cause the server to backup"
-  default     = "rcon-cli backup start"
-}
-
 variable "backups_path" {
   description = "the path where the server will backup relative to the minecraft data path"
-  default     = "FeedTheBeast/backups"
+  default     = "backups/"
 }
 
-variable "backup_index_path" {
-  description = "the path where the server will save the backup index relative to the minecraft data path"
-  default     = "FeedTheBeast/local/ftbutilities/backups.json"
+variable "world_path" {
+  description = "the path where the minecraft world lives"
+  default     = "world/"
 }
