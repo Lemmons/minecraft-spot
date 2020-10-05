@@ -26,7 +26,7 @@ data "template_cloudinit_config" "config" {
 }
 
 locals {
-  game = "minecraft-vanilla"
+  game = "minecraft_vanilla"
 }
 
 data "template_file" "minecraft" {
@@ -49,7 +49,7 @@ data "template_file" "minecraft" {
         content: |
           version: "3"
           services:
-            minecraft:
+            ${local.game}:
               container_name: ${local.game}
               image: ${var.docker_image}
               restart: on-failure
