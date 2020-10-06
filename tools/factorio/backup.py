@@ -42,6 +42,24 @@ def local_backup():
 
     path = f'{timestamp}.zip'
 
+    full_path = os.path.join(BACKUPS_PATH, path)
+    prev_size = -1
+    size = 0
+    while True:
+        LOGGER.info(f'waiting for {full_path} to finish backup. size: {size}')
+        try:
+            size = os.stat(full_path).st_size
+        except FileNotFoundError:
+            LOGGER.warn(f'{full_path} not found')
+            time.sleep(2)
+            continue
+
+        if size == prev_size:
+            break
+
+        prev_size = size
+        time.sleep(2)
+
     get_latest_local_backup.time = timestamp
     get_latest_local_backup.file = path
 
