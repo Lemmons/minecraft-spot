@@ -40,7 +40,7 @@ def local_backup():
     timestamp = int(time.time())
     rcon.send_command(f'/save {timestamp}.zip')
 
-    path = os.path.join(BACKUPS_PATH, f'{timestamp}.zip')
+    path = f'{timestamp}.zip'
 
     get_latest_local_backup.time = timestamp
     get_latest_local_backup.file = path
