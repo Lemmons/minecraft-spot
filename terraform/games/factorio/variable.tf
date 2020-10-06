@@ -26,7 +26,7 @@ variable "tools_docker_image_id" {
 
 variable "docker_image" {
   description = "the docker image to use"
-  default     = "factoriotools/factorio:0.18.10"
+  default     = "factoriotools/factorio:1.0.0"
 }
 
 variable "bucket_name" {
@@ -35,7 +35,7 @@ variable "bucket_name" {
 
 variable "subdomain" {
   description = "the subdomain name to run the instance at"
-  default     = "factario"
+  default     = "factorio"
 }
 
 variable "no_user_grace_period" {
@@ -43,17 +43,7 @@ variable "no_user_grace_period" {
   default     = "1800"
 }
 
-variable "backup_command" {
-  description = "the command to use to cause the server to backup"
-  default     = "rcon-cli ftb backup start"
-}
-
 variable "backups_path" {
   description = "the path where the server will backup relative to the minecraft data path"
-  default     = "FeedTheBeast/backups"
-}
-
-variable "backup_index_path" {
-  description = "the path where the server will save the backup index relative to the minecraft data path"
-  default     = "FeedTheBeast/backups/backups.json"
+  default     = "saves/"
 }

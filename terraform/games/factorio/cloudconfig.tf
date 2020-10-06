@@ -25,6 +25,10 @@ data "template_cloudinit_config" "config" {
   }
 }
 
+locals {
+  game = "factorio"
+}
+
 data "template_file" "factorio" {
   template = <<-EOF
     #cloud-config
@@ -35,8 +39,8 @@ data "template_file" "factorio" {
       - chown 845:845 /srv/factorio-spot/data
       - pip3 install awscli
       - aws configure set region ${var.aws_region}
-      - docker run --name set_route -e AWS_DEFAULT_REGION=${var.aws_region} -e FQDN=${var.subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")} -e ZONE_ID=${var.hosted_zone_id} -e GAME=minecraft -e BACKUPS_PATH=${var.backups_path} ${var.tools_docker_image_id} set_route.py
-      - docker run --name restore_backup -e AWS_DEFAULT_REGION=${var.aws_region} -e S3_BUCKET=${var.bucket_name} -e GAME=factorio -e BACKUPS_PATH=${var.backups_path} -v /srv/factorio-spot/data:/data ${var.tools_docker_image_id} restore_backup.py
+      - docker run --name set_route -e AWS_DEFAULT_REGION=${var.aws_region} -e FQDN=${var.subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")} -e ZONE_ID=${var.hosted_zone_id} -e GAME=${local.game} -e BACKUPS_PATH=${var.backups_path} ${var.tools_docker_image_id} set_route.py
+      - docker run --name restore_backup -e AWS_DEFAULT_REGION=${var.aws_region} -e S3_BUCKET=${var.bucket_name} -e GAME=${local.game} -e BACKUPS_PATH=${var.backups_path} -v /srv/factorio-spot/data:/data ${var.tools_docker_image_id} restore_backup.py
       - chmod -R a+rwX /srv/factorio-spot/data
       - docker-compose -f /srv/factorio-spot/docker-compose.yaml up -d
     write_files:
@@ -46,8 +50,8 @@ data "template_file" "factorio" {
         content: |
           version: "3"
           services:
-            factorio:
-              container_name: factorio
+            ${local.game}:
+              container_name: ${local.game}
               image: ${var.docker_image}
               restart: on-failure
               ports:
@@ -67,10 +71,8 @@ data "template_file" "factorio" {
                 AWS_DEFAULT_REGION: ${var.aws_region}
                 S3_BUCKET: ${var.bucket_name}
                 LIFECYCLE_HOOK_NAME: "${var.name_prefix}factorio-terminate"
-                BACKUP_COMMAND: "${var.backup_command}"
-                BACKUP_INDEX_PATH: ${var.backup_index_path}
                 BACKUPS_PATH: ${var.backups_path}
-                GAME: "factorio"
+                GAME: "${local.game}"
             check_players:
               container_name: check_players
               image: ${var.tools_docker_image_id}
@@ -80,8 +82,11 @@ data "template_file" "factorio" {
                 - /var/run/docker.sock:/var/run/docker.sock
               environment:
                 AWS_DEFAULT_REGION: ${var.aws_region}
+                S3_BUCKET: ${var.bucket_name}
+                LIFECYCLE_HOOK_NAME: "${var.name_prefix}minecraft-terminate"
+                BACKUPS_PATH: ${var.backups_path}
                 GRACE_PERIOD: "${var.no_user_grace_period}"
-                GAME: "factorio"
+                GAME: "${local.game}"
 EOF
 
 }
