@@ -3,5 +3,9 @@ output "userdata" {
 }
 
 output "port" {
-  value = 1
+  value = 34197
+}
+
+output "protocol" {
+  value = "udp"
 }

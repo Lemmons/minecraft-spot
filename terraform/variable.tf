@@ -80,3 +80,8 @@ variable "game_rendered_cloudconfig" {
 variable "game_port" {
   description = "The port the game server is running on"
 }
+
+variable "game_port_protocol" {
+  description = "The protocol of the port the game server is running on"
+  default     = "tcp"
+}
