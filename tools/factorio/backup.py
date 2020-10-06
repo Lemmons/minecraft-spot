@@ -30,7 +30,7 @@ get_latest_local_backup.file = None
 
 def local_backup():
     instance = spot_tools.instance.get_instance()
-    if instance.status == "exited" or spot_tools.instance.get_instance_health() != "healthy":
+    if instance.status == "exited":
         raise spot_tools.errors.UnableToBackupError("cannot backup, factorio not running")
 
     LOGGER.info('backing-up factorio locally')

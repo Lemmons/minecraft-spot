@@ -79,6 +79,7 @@ data "template_file" "factorio" {
               command: check_players.py
               restart: on-failure
               volumes:
+                - /srv/factorio-spot/data:/data
                 - /var/run/docker.sock:/var/run/docker.sock
               environment:
                 AWS_DEFAULT_REGION: ${var.aws_region}
