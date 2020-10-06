@@ -1,3 +1,5 @@
+import os
+
 import factorio_rcon
 
 GAME_DATA = '/data'
