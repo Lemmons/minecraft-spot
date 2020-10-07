@@ -1,11 +1,17 @@
 # minecraft-spot
-This repo contains some python code and a terraform module for the purpose of easily setting up the code and infrastructure to run minecraft using spot instances in aws.
+This repo contains some python code and a terraform module for the purpose of easily setting up the code and infrastructure to run minecraft (and other games) using spot instances in aws.
 
 The instance can be brought up using an api endpoint, and will automatically tear itself down after the instance is inactive (with no players online) after a certain period of time.
 
 It requires moderate experience with [terraform](https://www.terraform.io/intro/index.html) and [AWS](https://aws.amazon.com/)
 
 Currently only supports [FTB](https://www.feed-the-beast.com/) modded versions of minecraft.
+
+## Supported Games
+This project support a fairly modular architecture which means adding new game servers generally is pretty easy.  Currently supported games are:
+- Minecraft Java Edition
+- Minecraft Java Edition with mods (FTB and curse/twitch)
+- Factorio
 
 ## Usage
 WARNING: OUT OF DATE - NEEDS TO BE UPDATED FOR LATEST REFACTOR
@@ -108,4 +114,3 @@ Additionally you can look at the cloudwatch logs for the lambdas running for pot
   - modpack version info
   - allow upgrade of modpack (text field to input modpack url, button to set the `REMOVE_OLD_MODS="TRUE"` flag?)
 - Add back in option to use api password instead of Auth0
-- Add support for vanilla minecraft
