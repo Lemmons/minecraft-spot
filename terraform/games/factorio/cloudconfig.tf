@@ -26,7 +26,8 @@ data "template_cloudinit_config" "config" {
 }
 
 locals {
-  game = "factorio"
+  game     = "factorio"
+  mod_list = join(",", var.mod_list)
 }
 
 data "template_file" "factorio" {
@@ -53,6 +54,8 @@ data "template_file" "factorio" {
         -e S3_BUCKET=${var.bucket_name}
         -e GAME=${local.game}
         -e BACKUPS_PATH=${var.backups_path}
+        -e MODS_PATH=${var.mods_path}
+        -e MOD_LIST="${local.mod_list}"
         -v /srv/factorio-spot/data:/data
         ${var.tools_docker_image_id} restore_backup.py
       - chmod -R a+rwX /srv/factorio-spot/data
@@ -73,6 +76,10 @@ data "template_file" "factorio" {
               - 27015:27015/tcp
               volumes:
                 - /srv/factorio-spot/data:/factorio
+              environment:
+                UPDATE_MODS_ON_START: true
+                USERNAME: ${var.factorio_username}
+                TOKEN: ${var.factorio_token}
             check_termination:
               container_name: check_termination
               image: ${var.tools_docker_image_id}

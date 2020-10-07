@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import os.path
@@ -16,6 +17,8 @@ LOGGER = logging.getLogger(__name__)
 
 GAME_DATA = '/data'
 BACKUPS_PATH = os.path.join(GAME_DATA, os.environ.get('BACKUPS_PATH', 'saves/'))
+MOD_LIST = os.environ.get('MOD_LIST')
+MODS_PATH = os.path.join(GAME_DATA, os.environ.get('MODS_PATH', 'mods/'))
 
 S3_BUCKET = os.environ.get('S3_BUCKET')
 BACKUP_S3_KEY = 'backups/latest.zip'
@@ -88,3 +91,13 @@ def restore_backup():
         spot_tools.aws.download_from_s3(filename, S3_BUCKET, BACKUP_S3_KEY)
         LOGGER.info('Saving previous backup to {}'.format(PREVIOUS_BACKUP_S3_KEY))
         spot_tools.aws.save_to_s3(filename, S3_BUCKET, PREVIOUS_BACKUP_S3_KEY)
+
+    _install_mods()
+
+def _install_mods():
+    os.makedirs(MODS_PATH, exist_ok=True)
+    mod_list = MOD_LIST.split(',') + ['base']
+    mods = {"mods": [{"name": mod_name, "enabled": "true"} for mod_name in mod_list]}
+
+    with open(os.path.join(MODS_PATH, 'mod-list.json'), 'w') as fout:
+        json.dump(mods, fout)

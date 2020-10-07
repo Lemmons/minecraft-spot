@@ -44,6 +44,25 @@ variable "no_user_grace_period" {
 }
 
 variable "backups_path" {
-  description = "the path where the server will backup relative to the minecraft data path"
+  description = "the path where the server will backup relative to the factorio data path"
   default     = "saves/"
+}
+
+variable "mods_path" {
+  description = "the path where the server will install modes relative to the factorio data path"
+  default     = "mods/"
+}
+
+variable "mod_list" {
+  description = "a list of mods to install. This is the simple named used on factorio.com"
+  type        = list(string)
+  default     = []
+}
+
+variable "factorio_username" {
+  description = "your factorio.com username"
+}
+
+variable "factorio_token" {
+  description = "your factorio.com token. Find this in your user profile"
 }
