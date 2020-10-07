@@ -82,7 +82,7 @@ def restore_backup():
 
     if spot_tools.backup.get_latest_s3_backup_time():
         LOGGER.info('Restoring backup from {}'.format(BACKUP_S3_KEY))
-        filename = os.join(BACKUPS_PATH, 'lastest.zip')
+        filename = os.path.join(BACKUPS_PATH, 'lastest.zip')
         LOGGER.info('Downloading {} to {}'.format(BACKUP_S3_KEY, filename))
         spot_tools.aws.download_from_s3(filename, S3_BUCKET, BACKUP_S3_KEY)
         LOGGER.info('Saving previous backup to {}'.format(PREVIOUS_BACKUP_S3_KEY))
