@@ -38,7 +38,7 @@ function LoginTitleBar(props) {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="title" color="inherit" className={classes.flex}>
-          Minecraft Spot Controls
+          Spot Controller
         </Typography>
         {
           !isAuthenticated() && (

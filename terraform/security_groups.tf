@@ -8,7 +8,7 @@ resource "aws_security_group_rule" "minecraft" {
   type        = "ingress"
   from_port   = var.game_port
   to_port     = var.game_port
-  protocol    = "tcp"
+  protocol    = var.game_port_protocol
   cidr_blocks = ["0.0.0.0/0"]
 
   security_group_id = aws_security_group.minecraft.id
