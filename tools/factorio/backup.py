@@ -96,8 +96,11 @@ def restore_backup():
 
 def _install_mods():
     os.makedirs(MODS_PATH, exist_ok=True)
-    mod_list = MOD_LIST.split(',') + ['base']
+
+    mod_list = list(filter(None,['base'] + MOD_LIST.split(',')))
     mods = {"mods": [{"name": mod_name, "enabled": "true"} for mod_name in mod_list]}
 
-    with open(os.path.join(MODS_PATH, 'mod-list.json'), 'w') as fout:
-        json.dump(mods, fout)
+    mod_list_path = os.path.join(MODS_PATH, 'mod-list.json')
+    LOGGER.info(f'Saving mod list: {mod_list} to path: {mod_list_path}')
+    with open(mod_list_path, 'w') as fout:
+        json.dump(mods, fout, indent=4)

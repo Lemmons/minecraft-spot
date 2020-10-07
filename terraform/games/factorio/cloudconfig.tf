@@ -77,7 +77,7 @@ data "template_file" "factorio" {
               volumes:
                 - /srv/factorio-spot/data:/factorio
               environment:
-                UPDATE_MODS_ON_START: true
+                UPDATE_MODS_ON_START: "true"
                 USERNAME: ${var.factorio_username}
                 TOKEN: ${var.factorio_token}
             check_termination:
