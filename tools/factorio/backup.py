@@ -81,6 +81,7 @@ def restore_backup():
         pass
 
     if spot_tools.backup.get_latest_s3_backup_time():
+        os.makedirs(BACKUPS_PATH, exist_ok=True)
         LOGGER.info('Restoring backup from {}'.format(BACKUP_S3_KEY))
         filename = os.path.join(BACKUPS_PATH, 'lastest.zip')
         LOGGER.info('Downloading {} to {}'.format(BACKUP_S3_KEY, filename))
