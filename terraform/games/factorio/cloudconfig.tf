@@ -70,7 +70,7 @@ data "template_file" "factorio" {
               environment:
                 AWS_DEFAULT_REGION: ${var.aws_region}
                 S3_BUCKET: ${var.bucket_name}
-                LIFECYCLE_HOOK_NAME: "${var.name_prefix}factorio-terminate"
+                LIFECYCLE_HOOK_NAME: "${var.name_prefix}minecraft-terminate"
                 BACKUPS_PATH: ${var.backups_path}
                 GAME: "${local.game}"
             check_players:
