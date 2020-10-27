@@ -25,11 +25,15 @@ FQDN = os.environ.get('FQDN')
 client = discord.Client()
 
 async def send_server_status():
+    LOGGER.debug('starting server status loop')
     await client.wait_until_ready()
     channel = discord.utils.get(client.get_all_channels(), guild__name=DISCORD_SERVER, name=DISCORD_CHANNEL)
+    LOGGER.debug('got channel {channel}')
     status = None
     while not client.is_closed:
+        LOGGER.debug('status is {status}')
         if status is None:
+            LOGGER.debug('sending server starting message')
             await channel.send(f'{GAME} server is starting')
             status = 'starting'
 
@@ -38,10 +42,13 @@ async def send_server_status():
                 players = game_players.get_players()
             except:
                 players = None
+            LOGGER.debug(f'found {players} players in game')
             if players is not None:
                 ip_address = spot_tools.aws.get_ip_address()
+                LOGGER.debug('sending server up message')
                 await channel.send(f'{GAME} server is up at: {FQDN} ({ip_address})')
                 return
+        LOGGER.debug('sleeping 10 seconds')
         await asyncio.sleep(10)
 
 client.loop.create_task(send_server_status())
@@ -62,7 +69,7 @@ async def on_message(message):
         LOGGER.debug(f'no match found in: {message.content}')
         return
 
-    command = match.groupdict().get('command', 'help')
+    command = match.groupdict().get('command')
     if command == 'players':
         try:
             players = game_players.get_players()
@@ -78,7 +85,7 @@ async def on_message(message):
         await message.channel.send('Beginning server shutdown')
         spot_tools.aws.mark_instance_for_removal()
 
-    elif command == 'help':
+    else:
         await message.channel.send('''
             Valid commands are:
             players - get number of players on server
