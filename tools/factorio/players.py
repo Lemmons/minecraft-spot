@@ -1,5 +1,7 @@
 import re
 
+import factorio_rcon.factorio_rcon
+
 import spot_tools.instance
 import spot_tools.factorio.rcon
 
@@ -9,8 +11,13 @@ def get_players():
     if instance.status == "exited":
         return
 
-    rcon = spot_tools.factorio.rcon.get_rcon_client()
-    result = rcon.send_command('/players online')
+    try:
+        rcon = spot_tools.factorio.rcon.get_rcon_client()
+        result = rcon.send_command('/players online')
+    except (factorio_rcon.factorio_rcon.RCONClosed, factorio_rcon.factorio_rcon.RCONConnectError):
+        # reset the rcon client if we loose it
+        spot_tools.factorio.rcon.get_rcon_client._client = None
+        return None
 
     players = int(PLAYERS_RE.match(result).group('players'))
 

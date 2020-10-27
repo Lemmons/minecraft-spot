@@ -66,3 +66,13 @@ variable "factorio_username" {
 variable "factorio_token" {
   description = "your factorio.com token. Find this in your user profile"
 }
+
+variable "discord_token" {
+  description = "a discord bot token server control and status messages"
+  default     = ""
+}
+
+variable "discord_channel" {
+  description = "a discord channel for the discord bot to post in"
+  default     = ""
+}

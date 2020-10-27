@@ -90,6 +90,25 @@ data "template_file" "minecraft" {
                 WORLD_PATH: ${var.world_path}
                 GRACE_PERIOD: "${var.no_user_grace_period}"
                 GAME: "${local.game}"
+            discord_bot:
+              container_name: discord_bot
+              image: ${var.tools_docker_image_id}
+              command: discord_bot.py
+              restart: on-failure
+              volumes:
+                - /srv/factorio-spot/data:/data
+                - /var/run/docker.sock:/var/run/docker.sock
+              environment:
+                AWS_DEFAULT_REGION: ${var.aws_region}
+                S3_BUCKET: ${var.bucket_name}
+                LIFECYCLE_HOOK_NAME: "${var.name_prefix}minecraft-terminate"
+                BACKUPS_PATH: ${var.backups_path}
+                WORLD_PATH: ${var.world_path}
+                GRACE_PERIOD: "${var.no_user_grace_period}"
+                GAME: "${local.game}"
+                FQDN: "${var.subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}"
+                DISCORD_TOKEN: "${var.discord_token}"
+                DISCORD_CHANNEL: "${var.discord_channel}"
 EOF
 
 }
