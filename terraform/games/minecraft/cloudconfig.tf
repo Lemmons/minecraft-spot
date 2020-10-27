@@ -113,6 +113,7 @@ data "template_file" "minecraft" {
                 FQDN: "${var.subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}"
                 DISCORD_TOKEN: "${var.discord_token}"
                 DISCORD_CHANNEL: "${var.discord_channel}"
+                DISCORD_SERVER: "${var.discord_server}"
 EOF
 
 }

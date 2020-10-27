@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+import logging
+import os
+import time
+
 import spot_tools.logger
 import spot_tools.discord
 
@@ -16,3 +20,6 @@ def main():
         LOGGER.warning('No discord token provided. Bot not running')
         while True:
             time.sleep(600)
+
+if __name__ == "__main__":
+    main()

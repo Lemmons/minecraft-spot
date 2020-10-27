@@ -16,16 +16,17 @@ game_players = importlib.import_module(f'spot_tools.{GAME}.players')
 spot_tools.logger.setup_logging()
 LOGGER = logging.getLogger(__name__)
 
-COMMAND_RE = re.compile(r'^!(?P<phrase>(hey )?puter|game|server)( (?P<command>+*)|.*)$')
+COMMAND_RE = re.compile(r'^!(?P<phrase>(hey )?puter|game|server)( (?P<command>.+)|.*)$')
 
 DISCORD_CHANNEL = os.environ.get('DISCORD_CHANNEL')
+DISCORD_SERVER = os.environ.get('DISCORD_SERVER')
 FQDN = os.environ.get('FQDN')
 
 client = discord.Client()
 
 async def send_server_status():
     await client.wait_until_ready()
-    channel = discord.TextChannel(id=DISCORD_CHANNEL)
+    channel = discord.utils.get(client.get_all_channels(), guild__name=DISCORD_SERVER, name=DISCORD_CHANNEL)
     status = None
     while not client.is_closed:
         if status is None:
@@ -43,7 +44,7 @@ async def send_server_status():
                 return
         await asyncio.sleep(10)
 
-client.loop.send_server_status()
+client.loop.create_task(send_server_status())
 
 @client.event
 async def on_ready():
@@ -51,14 +52,14 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    LOGGER.debug(f'received message: {message}')
+    LOGGER.debug(f'received message: {message.content}')
 
     if message.author == client.user:
         return
 
-    match = COMMAND_RE.match(message)
+    match = COMMAND_RE.match(message.content)
     if not match:
-        LOGGER.debug(f'no match found in: {message}')
+        LOGGER.debug(f'no match found in: {message.content}')
         return
 
     command = match.groupdict().get('command', 'help')
