@@ -28,10 +28,10 @@ async def send_server_status():
     LOGGER.debug('starting server status loop')
     await client.wait_until_ready()
     channel = discord.utils.get(client.get_all_channels(), guild__name=DISCORD_SERVER, name=DISCORD_CHANNEL)
-    LOGGER.debug('got channel {channel}')
+    LOGGER.debug(f'got channel {channel}')
     status = None
-    while not client.is_closed:
-        LOGGER.debug('status is {status}')
+    while not client.is_closed():
+        LOGGER.debug(f'status is {status}')
         if status is None:
             LOGGER.debug('sending server starting message')
             await channel.send(f'{GAME} server is starting')
