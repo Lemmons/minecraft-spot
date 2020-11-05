@@ -83,3 +83,6 @@ def mark_instance_for_removal():
         DesiredCapacity=0,
         HonorCooldown=False,
     )
+
+def get_ip_address():
+    return requests.get('http://169.254.169.254/latest/meta-data/public-ipv4').text

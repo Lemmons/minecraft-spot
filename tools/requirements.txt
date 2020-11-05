@@ -4,3 +4,4 @@ boto3==1.12.16
 docker==4.2.0
 factorio-rcon-py==1.2.0
 requests==2.23.0
+discord.py==1.5.1

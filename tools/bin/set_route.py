@@ -15,7 +15,7 @@ ZONE_ID = os.environ.get('ZONE_ID')
 FQDN = os.environ.get('FQDN')
 
 def main():
-    ip_address = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4').text
+    ip_address = spot_tools.aws.get_ip_address()
 
     client = spot_tools.aws.get_boto_client('route53')
     change_batch = {'Changes': [

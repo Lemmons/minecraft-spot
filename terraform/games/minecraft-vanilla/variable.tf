@@ -52,3 +52,18 @@ variable "world_path" {
   description = "the path where the minecraft world lives"
   default     = "world/"
 }
+
+variable "discord_token" {
+  description = "a discord bot token server control and status messages"
+  default     = ""
+}
+
+variable "discord_server" {
+  description = "a discord server for the discord bot to post in"
+  default     = ""
+}
+
+variable "discord_channel" {
+  description = "a discord channel for the discord bot to post in"
+  default     = "general"
+}
