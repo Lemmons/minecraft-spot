@@ -27,7 +27,7 @@ resource "aws_api_gateway_integration" "options" {
   http_method             = aws_api_gateway_method.options.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.lambda.arn}/invocations"
+  uri                     = aws_lambda_function.lambda.invoke_arn
   depends_on              = [aws_api_gateway_method.options]
 }
 

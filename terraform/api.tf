@@ -42,7 +42,7 @@ resource "aws_api_gateway_integration" "start" {
   http_method             = aws_api_gateway_method.start_get.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.start.arn}/invocations"
+  uri                     = aws_lambda_function.start.invoke_arn
 }
 
 resource "aws_lambda_permission" "start" {
@@ -120,7 +120,7 @@ resource "aws_api_gateway_integration" "stop" {
   http_method             = aws_api_gateway_method.stop_get.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.stop.arn}/invocations"
+  uri                     = aws_lambda_function.stop.invoke_arn
 }
 
 resource "aws_lambda_permission" "stop" {
@@ -192,7 +192,7 @@ resource "aws_api_gateway_integration" "status" {
   http_method             = aws_api_gateway_method.status_get.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.status.arn}/invocations"
+  uri                     = aws_lambda_function.status.invoke_arn
 }
 
 resource "aws_lambda_permission" "status" {
