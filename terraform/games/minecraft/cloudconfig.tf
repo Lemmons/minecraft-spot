@@ -59,7 +59,7 @@ data "template_file" "minecraft" {
                 - /srv/minecraft-spot/data:/data
               environment:
                 EULA: "TRUE"
-                MAX_RAM: "7G"
+                MAX_MEMORY: "7G"
                 TYPE: "${var.modpack_type}"
                 ${var.modpack_type == "FTB" ? "FTB_SERVER_MOD" : "CF_SERVER_MOD"}: "${var.modpack_version}"
             check_termination:
