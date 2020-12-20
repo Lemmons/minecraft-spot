@@ -107,7 +107,6 @@ data "template_file" "minecraft" {
                 S3_BUCKET: ${var.bucket_name}
                 LIFECYCLE_HOOK_NAME: "${var.name_prefix}minecraft-terminate"
                 BACKUPS_PATH: ${var.backups_path}
-                WORLD_PATH: ${var.world_path}
                 GRACE_PERIOD: "${var.no_user_grace_period}"
                 GAME: "${local.game}"
                 FQDN: "${var.subdomain}.${replace(data.aws_route53_zone.zone.name, "/[.]$/", "")}"
