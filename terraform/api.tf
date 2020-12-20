@@ -315,9 +315,9 @@ resource "aws_api_gateway_base_path_mapping" "minecraft" {
 
 resource "aws_api_gateway_deployment" "api" {
   depends_on = [
-    aws_api_gateway_method.start_get,
-    aws_api_gateway_method.stop_get,
-    aws_api_gateway_method.status_get,
+    aws_api_gateway_integration.start,
+    aws_api_gateway_integration.stop,
+    aws_api_gateway_integration.status,
   ]
 
   rest_api_id = aws_api_gateway_rest_api.api.id
