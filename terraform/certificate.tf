@@ -11,18 +11,26 @@ resource "aws_acm_certificate" "webapp" {
 }
 
 resource "aws_route53_record" "webapp_cert_validation" {
-  name    = aws_acm_certificate.webapp.domain_validation_options[0].resource_record_name
-  type    = aws_acm_certificate.webapp.domain_validation_options[0].resource_record_type
-  zone_id = data.aws_route53_zone.zone.id
-  records = [aws_acm_certificate.webapp.domain_validation_options[0].resource_record_value]
-  ttl     = 60
+  for_each = {
+    for dvo in aws_acm_certificate.webapp.domain_validation_options: dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.zone.id
 }
 
 resource "aws_acm_certificate_validation" "webapp" {
   provider = aws.east
 
   certificate_arn         = aws_acm_certificate.webapp.arn
-  validation_record_fqdns = [aws_route53_record.webapp_cert_validation.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.webapp_cert_validation: record.fqdn]
 }
 
 resource "aws_acm_certificate" "api" {
@@ -33,16 +41,24 @@ resource "aws_acm_certificate" "api" {
 }
 
 resource "aws_route53_record" "api_cert_validation" {
-  name    = aws_acm_certificate.api.domain_validation_options[0].resource_record_name
-  type    = aws_acm_certificate.api.domain_validation_options[0].resource_record_type
-  zone_id = data.aws_route53_zone.zone.id
-  records = [aws_acm_certificate.api.domain_validation_options[0].resource_record_value]
-  ttl     = 60
+  for_each = {
+    for dvo in aws_acm_certificate.api.domain_validation_options: dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.zone.id
 }
 
 resource "aws_acm_certificate_validation" "api" {
   provider = aws.east
 
   certificate_arn         = aws_acm_certificate.api.arn
-  validation_record_fqdns = [aws_route53_record.api_cert_validation.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.api_cert_validation: record.fqdn]
 }

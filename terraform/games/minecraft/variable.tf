@@ -67,6 +67,10 @@ variable "backup_index_path" {
   default     = "FeedTheBeast/local/ftbutilities/backups.json"
 }
 
+variable "save_restore_path" {
+  default = "FeedTheBeast"
+}
+
 variable "discord_token" {
   description = "a discord bot token server control and status messages"
   default     = ""

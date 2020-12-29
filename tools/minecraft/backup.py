@@ -20,7 +20,7 @@ LOGGER = logging.getLogger(__name__)
 GAME_DATA = '/data'
 BACKUP_INDEX_PATH = os.path.join(GAME_DATA, os.environ.get('BACKUP_INDEX_PATH', 'FeedTheBeast/local/ftbutilities/backups.json'))
 BACKUP_COMMAND = os.environ.get('BACKUP_COMMAND', 'rcon-cli backup start')
-SAVE_RESTORE_PATH = os.path.join(GAME_DATA, 'FeedTheBeast')
+SAVE_RESTORE_PATH = os.path.join(GAME_DATA, os.environ.get('SAVE_RESTORE_PATH', 'FeedTheBeast'))
 
 S3_BUCKET = os.environ.get('S3_BUCKET')
 BACKUP_S3_KEY = 'backups/latest.zip'
